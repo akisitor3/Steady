@@ -46,17 +46,27 @@ constants/
 
 ---
 
+## Identidade Visual
+
+Inspiração: **Apple** — branco, espaço, precisão, tipografia Inter.
+
+| Token | Valor |
+|---|---|
+| Cor primária | `#0F6E56` (teal) — **substitui o `#3B82F6` da skill premium** |
+| Cor clara | `#1D9E75` |
+| Cor escura | `#0A5240` |
+| Gradiente hero | `linear-gradient(145deg, #1D9E75, #0F6E56, #0A5240)` |
+| Sombra | dupla teal — `rgba(15,110,86,0.34)` + `rgba(15,110,86,0.20)` |
+| Tipografia | Inter — escala 12/14/16/18/24/30/36 |
+| Surface | `#FFFFFF` · Background: `#F5F5F7` |
+
+---
+
 ## Skills de design (obrigatório para qualquer trabalho de UI)
 
-Antes de qualquer tarefa de UI/UX, ler SEMPRE este ficheiro antes de qualquer outra coisa:
-1. `.claude/skills/design-system/SKILL.md` — sistema visual premium do Steady (Apple-inspired)
-2. Skill `premium` do Claude Code — princípios de design premium adicionais
-
-**Identidade visual do Steady:**
-- Inspiração: Apple — branco, tipografia Inter, espaço, precisão
-- Cor primária: `#0F6E56` (teal) — **substitui o `#3B82F6` azul que a skill premium usa por defeito**
-- Gradiente hero: `linear-gradient(145deg, #1D9E75, #0F6E56, #0A5240)`
-- Sombra dupla teal em vez de azul
+Antes de qualquer tarefa de UI/UX, ler SEMPRE por esta ordem:
+1. `.claude/skills/design-system/SKILL.md` — sistema visual premium do Steady
+2. Secção **Identidade Visual** acima — cores e tokens do Steady
 
 ---
 

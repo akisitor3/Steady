@@ -778,15 +778,28 @@
       border: 0.5px solid var(--border);
       overflow: hidden;
       box-shadow: var(--shadow-sm);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
-    .hm-title {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--text);
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
+    .hm-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 16px 12px;
+      border-bottom: 0.5px solid var(--border);
     }
+    .hm-title { font-size: 11px; font-weight: 700; color: var(--text); letter-spacing: 0.8px; text-transform: uppercase; }
+    .hm-chevron { font-size: 16px; color: var(--text3); line-height: 1; }
+    .hm-meta { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px 6px; }
+    .hm-updated { font-size: 11px; color: var(--text3); }
+    .hm-status { display: flex; align-items: baseline; gap: 6px; }
+    .hm-status-label { font-size: 11px; font-weight: 700; color: var(--primary); letter-spacing: 0.5px; }
+    .hm-status-value { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1; }
+    .hm-chart-wrap { padding: 0 0 4px; }
+    .hm-metrics { display: flex; border-top: 0.5px solid var(--border); }
+    .hm-metric { flex: 1; padding: 12px 0 12px 16px; border-right: 0.5px solid var(--border); }
+    .hm-metric:last-child { border-right: none; }
+    .hm-metric-icon  { font-size: 14px; margin-bottom: 4px; }
+    .hm-metric-val   { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+    .hm-metric-unit  { font-size: 12px; color: var(--text3); font-weight: 400; }
+    .hm-metric-label { font-size: 12px; color: var(--text3); margin-top: 4px; }
     /* VFC */
     .hrv-card {
       background: var(--bg);
@@ -1143,85 +1156,124 @@
         </div>
       </div>
 
-      <!-- Activity Monitor Card -->
-      <div class="activity-card">
-        <div class="activity-header">
-          <div>
-            <div class="activity-title">Actividade de hoje</div>
-            <div class="activity-sub">Apple Health · WHOOP · actualizado 17:27</div>
-          </div>
-          <div class="activity-now">
-            <div class="activity-now-label">Activo</div>
-            <div class="activity-now-val">8 420<span class="activity-now-unit"> passos</span></div>
-          </div>
-        </div>
-
-        <!-- Chart SVG -->
-        <div style="position:relative; padding: 0 16px 8px;">
-          <!-- Event icons -->
-          <div style="position:relative; height:20px; margin-bottom:4px;">
-            <span style="position:absolute;left:2px;  font-size:11px;">🌙</span>
-            <span style="position:absolute;left:90px; font-size:11px;">🏃</span>
-            <span style="position:absolute;left:138px;font-size:11px;">🍽️</span>
-            <span style="position:absolute;left:196px;font-size:11px;">🍽️</span>
-            <span style="position:absolute;right:0px; font-size:10px;color:var(--text3);font-weight:500;">agora</span>
-          </div>
-          <svg width="100%" viewBox="0 0 310 80" style="display:block;">
+      <!-- Bio Resposta -->
+      <div class="health-monitor">
+        <div class="hm-header">
+          <span class="hm-title">Bio Resposta</span>
+          <svg width="44" height="44" viewBox="0 0 44 44">
             <defs>
-              <linearGradient id="actGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" style="stop-color:var(--primary)" stop-opacity="0.12"/>
-                <stop offset="100%" style="stop-color:var(--primary)" stop-opacity="0"/>
+              <linearGradient id="br-grad" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0%"   stop-color="#6366F1"/>
+                <stop offset="33%"  stop-color="#0F6E56"/>
+                <stop offset="66%"  stop-color="#F97316"/>
+                <stop offset="100%" stop-color="#10B981"/>
               </linearGradient>
             </defs>
-            <!-- Sleep zone -->
-            <rect x="0" y="0" width="72" height="68" style="fill:var(--colorSleep)" rx="2"/>
-            <!-- Grid lines -->
-            <line x1="0" y1="23" x2="296" y2="23" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
-            <line x1="0" y1="46" x2="296" y2="46" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
-            <!-- Area fill -->
-            <path d="M 0 58 C 18 57,36 55,52 50 C 60 47,66 38,72 32
-                     C 80 26,88 18,96 28 C 104 36,108 44,116 38
-                     C 124 32,128 24,136 30 C 144 36,148 42,156 38
-                     C 164 34,170 28,178 32 C 186 36,190 42,198 36
-                     C 206 30,212 24,220 30 C 228 36,234 44,242 40
-                     C 250 36,256 28,264 34 C 272 40,278 46,286 42 L 286 68 L 0 68 Z"
-              fill="url(#actGrad)"/>
-            <!-- Activity line -->
-            <path d="M 0 58 C 18 57,36 55,52 50 C 60 47,66 38,72 32
-                     C 80 26,88 18,96 28 C 104 36,108 44,116 38
-                     C 124 32,128 24,136 30 C 144 36,148 42,156 38
-                     C 164 34,170 28,178 32 C 186 36,190 42,198 36
-                     C 206 30,212 24,220 30 C 228 36,234 44,242 40
-                     C 250 36,256 28,264 34 C 272 40,278 46,286 42"
-              fill="none" style="stroke:var(--primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-            <!-- Current time dashed line -->
-            <line x1="286" y1="0" x2="286" y2="68" style="stroke:var(--primary)" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
-            <circle cx="286" cy="42" r="3" style="fill:var(--primary)"/>
-            <!-- Time labels -->
-            <text x="0"   y="78" font-size="9" style="fill:var(--text3)" font-family="Inter,sans-serif">00:00</text>
-            <text x="68"  y="78" font-size="9" style="fill:var(--text3)" font-family="Inter,sans-serif">06:00</text>
-            <text x="140" y="78" font-size="9" style="fill:var(--text3)" font-family="Inter,sans-serif">12:00</text>
-            <text x="212" y="78" font-size="9" style="fill:var(--text3)" font-family="Inter,sans-serif">17:00</text>
-            <text x="271" y="78" font-size="9" style="fill:var(--primary)" font-family="Inter,sans-serif" font-weight="600">17:27</text>
+            <circle cx="22" cy="22" r="19" fill="none" stroke="#F3F4F6" stroke-width="3.5"/>
+            <circle cx="22" cy="22" r="19" fill="none" stroke="url(#br-grad)" stroke-width="3.5"
+              stroke-dasharray="86 120" stroke-linecap="round" transform="rotate(-90 22 22)"/>
+            <text x="22" y="23" font-size="12" font-weight="700" fill="#111827" text-anchor="middle"
+              font-family="Inter,sans-serif" letter-spacing="-0.5">72</text>
+            <text x="22" y="31" font-size="7" font-weight="700" fill="#0F6E56" text-anchor="middle"
+              font-family="Inter,sans-serif" letter-spacing="0.6">BOM</text>
+          </svg>
+        </div>
+        <div class="hm-meta">
+          <span class="hm-updated">Apple Health · 17:27</span>
+        </div>
+        <div class="hm-chart-wrap">
+          <svg width="100%" viewBox="0 0 330 110" style="display:block">
+            <defs>
+              <linearGradient id="hm-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#0F6E56" stop-opacity="0.14"/>
+                <stop offset="100%" stop-color="#0F6E56" stop-opacity="0"/>
+              </linearGradient>
+              <clipPath id="hm-clip">
+                <rect x="20" y="23" width="278" height="72"/>
+              </clipPath>
+            </defs>
+
+            <!-- Event markers -->
+            <text x="68"  y="14" font-size="11" text-anchor="middle" font-family="serif">🌙</text>
+            <text x="148" y="14" font-size="11" text-anchor="middle" font-family="serif">🥣</text>
+            <text x="179" y="14" font-size="11" text-anchor="middle" font-family="serif">🔥</text>
+            <text x="227" y="14" font-size="11" text-anchor="middle" font-family="serif">🍱</text>
+            <text x="267" y="14" font-size="11" text-anchor="middle" font-family="serif">⚡</text>
+
+            <!-- Sleep zone (00:00–06:30) -->
+            <rect x="20" y="23" width="104" height="72" fill="rgba(129,140,248,0.07)" rx="0"/>
+
+            <!-- Horizontal grid lines -->
+            <line x1="20" y1="23" x2="298" y2="23" stroke="#F3F4F6" stroke-width="0.8"/>
+            <line x1="20" y1="59" x2="298" y2="59" stroke="#F3F4F6" stroke-width="0.5" stroke-dasharray="3,3"/>
+            <line x1="20" y1="95" x2="298" y2="95" stroke="#F3F4F6" stroke-width="0.8"/>
+
+            <!-- Vertical grid lines at 06:00, 10:00, 14:00 -->
+            <line x1="116" y1="23" x2="116" y2="95" stroke="#F3F4F6" stroke-width="0.5"/>
+            <line x1="179" y1="23" x2="179" y2="95" stroke="#F3F4F6" stroke-width="0.5"/>
+            <line x1="243" y1="23" x2="243" y2="95" stroke="#F3F4F6" stroke-width="0.5"/>
+
+            <!-- Gradient fill -->
+            <path clip-path="url(#hm-clip)"
+              d="M 20 82
+                 C 38 82, 55 86, 72 86
+                 C 92 86, 108 83, 116 80
+                 C 124 76, 130 70, 140 62
+                 C 150 54, 162 42, 179 32
+                 C 183 29, 187 31, 192 36
+                 C 198 40, 205 46, 215 52
+                 C 222 56, 228 58, 237 54
+                 C 246 50, 258 44, 275 43
+                 C 283 42, 292 42, 298 43
+                 L 298 95 L 20 95 Z"
+              fill="url(#hm-grad)"/>
+
+            <!-- Score line -->
+            <path clip-path="url(#hm-clip)"
+              d="M 20 82
+                 C 38 82, 55 86, 72 86
+                 C 92 86, 108 83, 116 80
+                 C 124 76, 130 70, 140 62
+                 C 150 54, 162 42, 179 32
+                 C 183 29, 187 31, 192 36
+                 C 198 40, 205 46, 215 52
+                 C 222 56, 228 58, 237 54
+                 C 246 50, 258 44, 275 43
+                 C 283 42, 292 42, 298 43"
+              fill="none" stroke="#0F6E56" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round"/>
+
+            <!-- Now: dashed vertical line -->
+            <line x1="298" y1="21" x2="298" y2="97"
+              stroke="#0F6E56" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.35"/>
+            <!-- Now: dot -->
+            <circle cx="298" cy="43" r="3.5" fill="#0F6E56" stroke="white" stroke-width="1.5"/>
+
+            <!-- X axis labels -->
+            <text x="20"  y="108" font-size="8" fill="#9CA3AF" text-anchor="start"  font-family="Inter,sans-serif">00:00</text>
+            <text x="116" y="108" font-size="8" fill="#9CA3AF" text-anchor="middle" font-family="Inter,sans-serif">06:00</text>
+            <text x="179" y="108" font-size="8" fill="#9CA3AF" text-anchor="middle" font-family="Inter,sans-serif">10:00</text>
+            <text x="243" y="108" font-size="8" fill="#9CA3AF" text-anchor="middle" font-family="Inter,sans-serif">14:00</text>
+            <text x="298" y="108" font-size="8" fill="#0F6E56" text-anchor="end"    font-family="Inter,sans-serif" font-weight="600">17:27</text>
           </svg>
         </div>
 
-        <!-- 3 métricas -->
-        <div class="activity-metrics">
-          <div class="activity-metric">
-            <div class="activity-metric-icon">🌙</div>
-            <div class="activity-metric-val">7<span class="activity-metric-unit">h</span> 32<span class="activity-metric-unit">m</span></div>
-            <div class="activity-metric-label">Sono</div>
+        <!-- Métricas -->
+        <div class="hm-metrics">
+          <div class="hm-metric">
+            <div class="hm-metric-icon">🌙</div>
+            <div class="hm-metric-val">7<span class="hm-metric-unit">h</span> 32<span class="hm-metric-unit">m</span></div>
+            <div class="hm-metric-label">Sono</div>
           </div>
-          <div class="activity-metric">
-            <div class="activity-metric-icon">🏃</div>
-            <div class="activity-metric-val">8 420<span class="activity-metric-unit"> pass.</span></div>
-            <div class="activity-metric-label">Passos</div>
+          <div class="hm-metric">
+            <div class="hm-metric-icon">🏃</div>
+            <div class="hm-metric-val">8 420<span class="hm-metric-unit"> pass.</span></div>
+            <div class="hm-metric-label">Passos</div>
           </div>
-          <div class="activity-metric">
-            <div class="activity-metric-icon">🍽️</div>
-            <div class="activity-metric-val">1 240<span class="activity-metric-unit"> kcal</span></div>
-            <div class="activity-metric-label">Calorias</div>
+          <div class="hm-metric">
+            <div class="hm-metric-icon">🍽️</div>
+            <div class="hm-metric-val">1 240<span class="hm-metric-unit"> kcal</span></div>
+            <div class="hm-metric-label">Calorias</div>
           </div>
         </div>
       </div>
