@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
   },
   cardHeaderLeft: { flex: 1, marginRight: 12 },
-  cardTitle:      { fontSize: 18, fontWeight: '700', color: Colors.text, letterSpacing: -0.3 },
+  cardTitle:      { fontSize: 15, fontWeight: '600', color: Colors.text, letterSpacing: -0.2 },
   cardSub:        { fontSize: 12, color: Colors.textSecondary, marginTop: 3 },
 
   divider: { height: 0.5, backgroundColor: Colors.border },

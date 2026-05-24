@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md, paddingVertical: Spacing.md,
   },
   foodHeaderLeft: { flex: 1, marginRight: 12 },
-  foodTitle: { fontSize: 18, fontWeight: '700', color: Colors.text, letterSpacing: -0.3 },
+  foodTitle: { fontSize: 15, fontWeight: '600', color: Colors.text, letterSpacing: -0.2 },
   foodSub:   { fontSize: 12, color: Colors.textSecondary, marginTop: 3 },
   foodRing: {
     width: 44, height: 44,
