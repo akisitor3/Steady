@@ -109,10 +109,13 @@ Só avançar se não houver findings críticos ou altos por resolver.
 
 ## Início de sessão
 
-Antes de responder ou agir, executar por esta ordem:
+**NÃO activar brainstorming no arranque.** Ler o estado do projecto é suficiente — não é uma tarefa criativa nova.
+
+Executar por esta ordem:
 1. Carregar skill `karpathy-guidelines`
 2. Ler `/Volumes/KHONSHU/Brain/Steady/LAST_SESSION.md` — estado real da última sessão
 3. Ler `/Volumes/KHONSHU/Brain/Steady/todo.md` — tarefas activas e próximos passos
+4. Resumir o estado ao utilizador em 3–4 linhas e aguardar instrução
 
 ## Fecho de sessão
 

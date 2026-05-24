@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Steady — Hero Card Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #111;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 32px;
+      padding: 48px 24px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+
+    /* ── Hero card ─────────────────────────────── */
+    .hero {
+      width: 361px;
+      background: linear-gradient(145deg, #1D9E75 0%, #0F6E56 52%, #0A5240 100%);
+      border-radius: 22px;
+      padding: 20px 20px 16px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 12px 36px rgba(15,110,86,0.40),
+        0 4px 12px rgba(15,110,86,0.24),
+        0 1px 3px rgba(0,0,0,0.18);
+    }
+
+    /* orb grande (top-right) */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -32px; right: -32px;
+      width: 190px; height: 190px;
+      background: radial-gradient(circle, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 68%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    /* orb pequeno (bottom-right) */
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -12px; right: 18px;
+      width: 120px; height: 120px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 65%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    /* ── Top row ─────────────────────────────── */
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-left { flex: 1; min-width: 0; }
+
+    .hero-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.52);
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .hero-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .hero-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,0.62);
+      margin-top: 5px;
+      font-weight: 400;
+      white-space: nowrap;
+      letter-spacing: -0.1px;
+    }
+
+    /* ── Pills ───────────────────────────────── */
+    .pills {
+      background: rgba(255,255,255,0.13);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 14px;
+      border: 0.5px solid rgba(255,255,255,0.10);
+      padding: 9px 12px;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .pill { text-align: center; }
+
+    .pill-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.15;
+      display: block;
+      letter-spacing: -0.3px;
+    }
+    .pill-val.dim {
+      color: rgba(255,255,255,0.42);
+      font-weight: 600;
+      font-size: 12px;
+    }
+    .pill-val.accent {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.6px;
+    }
+
+    .pill-lbl {
+      font-size: 8.5px;
+      color: rgba(255,255,255,0.46);
+      display: block;
+      margin-top: 2px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .pill-lbl.accent { color: rgba(255,255,255,0.62); }
+
+    .pill-arrow {
+      font-size: 8px;
+      color: rgba(255,255,255,0.28);
+      margin-bottom: 13px;
+      flex-shrink: 0;
+      padding: 0 2px;
+    }
+
+    /* divider antes do Próx. dose */
+    .pill-divider {
+      width: 0.5px;
+      height: 32px;
+      background: rgba(255,255,255,0.15);
+      margin: 0 6px;
+      flex-shrink: 0;
+    }
+
+    /* ── Graph ───────────────────────────────── */
+    .hero-chart {
+      position: relative;
+      z-index: 1;
+      margin: 14px -2px 8px;
+    }
+    .hero-chart svg { display: block; width: 100%; }
+
+    /* ── Footer ──────────────────────────────── */
+    .hero-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    .foot-l {
+      font-size: 11px;
+      color: rgba(255,255,255,0.40);
+      font-weight: 400;
+    }
+    .foot-r {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.72);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .foot-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.55);
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <span class="label">Hero Card — versão combinada</span>
+
+  <div class="hero">
+
+    <!-- Top row -->
+    <div class="hero-top">
+      <div class="hero-left">
+        <div class="hero-eyebrow">Próxima Injeção</div>
+        <div class="hero-value" id="daysValue">4 dias</div>
+        <div class="hero-sub" id="heroSub">Quinta-feira, 28 Mai · 5.0 mg</div>
+      </div>
+
+      <div class="pills">
+        <div class="pill">
+          <span class="pill-val" id="pillHoje">—</span>
+          <span class="pill-lbl">Hoje</span>
+        </div>
+        <span class="pill-arrow">→</span>
+        <div class="pill">
+          <span class="pill-val dim" id="pillAmanha">—</span>
+          <span class="pill-lbl">Amanhã</span>
+        </div>
+        <div class="pill-divider"></div>
+        <div class="pill">
+          <span class="pill-val accent" id="pillProx">—</span>
+          <span class="pill-lbl accent">Próx. dose</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SVG chart (drawn by JS) -->
+    <div class="hero-chart">
+      <svg id="pkChart" height="72" viewBox="0 0 325 72" preserveAspectRatio="none"></svg>
+    </div>
+
+    <!-- Footer -->
+    <div class="hero-footer">
+      <span class="foot-l" id="footL">Última: —</span>
+      <span class="foot-r"><span class="foot-dot"></span><span id="footR">Próxima: —</span></span>
+    </div>
+
+  </div>
+
+  <script>
+    // ── PK engine ─────────────────────────────────────
+    const Q0     = 7.9;   // mg — steady state após 4 semanas
+    const T_HALF = 5;     // dias — Tirzepatida
+    const DOSE   = 5.0;   // mg
+
+    function pk(t) { return Q0 * Math.pow(0.5, t / T_HALF); }
+
+    // ── Timing (relativo à última injeção) ───────────
+    // Última injeção: 24 Mai (t=0)
+    // Hoje           = 24 Mai, ~21h depois  → t ≈ 0.875 dias
+    // Próxima        = 28 Mai               → t = 4 dias
+    const T_LAST = 0;
+    const T_NOW  = 0.875;
+    const T_NEXT = 4;
+    const T_END  = T_NEXT + 1.5;   // preview pós-dose
+
+    // ── Valores PK calculados ────────────────────────
+    const qHoje    = pk(T_NOW);
+    const qAmanha  = pk(T_NOW + 1);
+    const qPreDose = pk(T_NEXT);
+    const qPosDose = qPreDose + DOSE;
+
+    document.getElementById('pillHoje').textContent   = qHoje.toFixed(1);
+    document.getElementById('pillAmanha').textContent = qAmanha.toFixed(1);
+    document.getElementById('pillProx').textContent   = qPosDose.toFixed(1);
+
+    // ── Datas ────────────────────────────────────────
+    const BASE = new Date(2026, 4, 24); // 24 Mai 2026
+
+    function fmtDate(d) {
+      const dias = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+      const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      return `${dias[d.getDay()]}, ${d.getDate()} ${meses[d.getMonth()]}`;
+    }
+    function fmtShort(d) {
+      const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      return `${d.getDate()} ${meses[d.getMonth()]}`;
+    }
+
+    const nextDate = new Date(BASE.getTime() + T_NEXT * 86400000);
+    const daysLeft = Math.round(T_NEXT - T_NOW);
+
+    document.getElementById('heroSub').textContent    = `${fmtDate(nextDate)} · ${DOSE.toFixed(1)} mg`;
+    document.getElementById('footL').textContent      = `Última: ${fmtShort(BASE)}`;
+    document.getElementById('footR').textContent      = `Próxima: ${fmtShort(nextDate)}`;
+
+    // ── SVG graph ─────────────────────────────────────
+    const SVG_W = 325, SVG_H = 72;
+    const PL = 18, PR = 18, PT = 10, PB = 12;
+    const Q_MIN = 2.5, Q_MAX = 11.5;
+
+    function xOf(t)  { return PL + (t / T_END) * (SVG_W - PL - PR); }
+    function yOf(q)  { return PT + (1 - (q - Q_MIN) / (Q_MAX - Q_MIN)) * (SVG_H - PT - PB); }
+
+    // Pontos-chave
+    const Ax = xOf(T_LAST), Ay = yOf(Q0);
+    const Bx = xOf(T_NOW),  By = yOf(qHoje);
+    const Cx = xOf(T_NEXT), CyLo = yOf(qPreDose), CyHi = yOf(qPosDose);
+    const Dx = xOf(T_END),  Dy   = yOf(qPosDose * Math.pow(0.5, 1.5 / T_HALF));
+
+    // Linha de decaimento: 80 pontos para curva suave
+    function decayPath() {
+      const steps = 80;
+      return Array.from({length: steps + 1}, (_, i) => {
+        const t = (T_NEXT / steps) * i;
+        const x = xOf(t).toFixed(1);
+        const y = yOf(pk(t)).toFixed(1);
+        return i === 0 ? `M${x},${y}` : `L${x},${y}`;
+      }).join(' ');
+    }
+
+    const svg = document.getElementById('pkChart');
+    const yFloor = SVG_H - 4;
+
+    // 1. Linhas verticais de referência (atrás de tudo)
+    svg.innerHTML += `
+      <line x1="${Ax.toFixed(1)}" y1="${Ay.toFixed(1)}"
+            x2="${Ax.toFixed(1)}" y2="${yFloor}"
+            stroke="rgba(255,255,255,0.20)" stroke-width="1"
+            stroke-dasharray="2,3"/>
+      <line x1="${Cx.toFixed(1)}" y1="${CyHi.toFixed(1)}"
+            x2="${Cx.toFixed(1)}" y2="${yFloor}"
+            stroke="rgba(255,255,255,0.20)" stroke-width="1"
+            stroke-dasharray="2,3"/>
+    `;
+
+    // 2. Curva de decaimento A → C (dashed)
+    svg.innerHTML += `
+      <path d="${decayPath()}"
+            fill="none"
+            stroke="rgba(255,255,255,0.68)"
+            stroke-width="1.5"
+            stroke-dasharray="4.5,4"
+            stroke-linecap="round"
+            stroke-linejoin="round"/>
+    `;
+
+    // 3. Spike vertical no ponto C (sólido)
+    svg.innerHTML += `
+      <line x1="${Cx.toFixed(1)}" y1="${CyLo.toFixed(1)}"
+            x2="${Cx.toFixed(1)}" y2="${CyHi.toFixed(1)}"
+            stroke="rgba(255,255,255,0.68)"
+            stroke-width="1.5"
+            stroke-linecap="round"/>
+    `;
+
+    // 4. Preview de decaimento pós-dose C → D (sólido, mais suave)
+    svg.innerHTML += `
+      <path d="M${Cx.toFixed(1)},${CyHi.toFixed(1)} L${Dx.toFixed(1)},${Dy.toFixed(1)}"
+            fill="none"
+            stroke="rgba(255,255,255,0.45)"
+            stroke-width="1.5"
+            stroke-linecap="round"/>
+    `;
+
+    // 5. Dots
+    // Ponto A — última injeção (grande)
+    svg.innerHTML += `<circle cx="${Ax.toFixed(1)}" cy="${Ay.toFixed(1)}" r="5.5" fill="#fff"/>`;
+    // Ponto B — hoje (pequeno)
+    svg.innerHTML += `<circle cx="${Bx.toFixed(1)}" cy="${By.toFixed(1)}" r="3.5" fill="#fff"/>`;
+    // Ponto C — próxima injeção (grande, no topo do spike)
+    svg.innerHTML += `<circle cx="${Cx.toFixed(1)}" cy="${CyHi.toFixed(1)}" r="5.5" fill="#fff"/>`;
+  </script>
+
+</body>
+</html>
