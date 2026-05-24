@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Steady — Premium Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #D8D8DC;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 48px 24px 80px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── Phone shell ─────────────────────────────────── */
+    .phone {
+      width: 393px;
+      height: 852px;
+      background: #F5F5F7;
+      border-radius: 54px;
+      box-shadow:
+        0 0 0 1.5px rgba(255,255,255,0.18) inset,
+        0 0 0 10px #1A1A1A,
+        0 0 0 11px #2C2C2E,
+        0 48px 96px rgba(0,0,0,0.36),
+        0 16px 40px rgba(0,0,0,0.22),
+        0 4px 12px rgba(0,0,0,0.14);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ── Dynamic Island ──────────────────────────────── */
+    .di {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 126px;
+      height: 37px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 20;
+    }
+
+    /* ── Status bar ──────────────────────────────────── */
+    .statusbar {
+      flex-shrink: 0;
+      padding: 18px 28px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #F5F5F7;
+      position: relative;
+      z-index: 10;
+    }
+    .sb-time {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111827;
+      letter-spacing: -0.2px;
+    }
+    .sb-icons { display: flex; gap: 6px; align-items: center; }
+
+    /* ── Screen (scrollable) ─────────────────────────── */
+    .screen {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      position: relative;
+    }
+    .screen::-webkit-scrollbar { display: none; }
+
+    .tab-panel { display: none; padding: 0 16px 96px; }
+    .tab-panel.active { display: block; }
+
+    /* ── Tab bar ─────────────────────────────────────── */
+    .tabbar {
+      flex-shrink: 0;
+      height: 82px;
+      background: rgba(249,249,249,0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 0.5px solid rgba(0,0,0,0.10);
+      display: flex;
+      align-items: flex-start;
+      padding-top: 10px;
+      position: relative;
+      z-index: 30;
+    }
+    .tabbar::after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 134px;
+      height: 5px;
+      background: #111827;
+      border-radius: 3px;
+      opacity: 0.18;
+    }
+    .tab-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-family: 'Inter', sans-serif;
+      padding: 0;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab-btn .t-icon { font-size: 22px; line-height: 1; opacity: 0.28; transition: opacity 0.15s; }
+    .tab-btn .t-label { font-size: 10px; font-weight: 600; color: #9CA3AF; letter-spacing: 0.15px; transition: color 0.15s; }
+    .tab-btn.active .t-icon { opacity: 1; }
+    .tab-btn.active .t-label { color: #0F6E56; }
+
+    /* ── Design tokens ───────────────────────────────── */
+    :root {
+      --primary:      #0F6E56;
+      --primaryLight: #1D9E75;
+      --primaryDark:  #0A5240;
+      --primarySoft:  #E6F4F0;
+      --bg:           #FFFFFF;
+      --bgSec:        #F5F5F7;
+      --text:         #111827;
+      --text2:        #6B7280;
+      --text3:        #9CA3AF;
+      --border:       rgba(0,0,0,0.08);
+      --borderLight:  rgba(0,0,0,0.05);
+      --danger:       #DC2626;
+      --warning:      #D97706;
+      --success:      #16A34A;
+      --shadow-sm:    0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:    0 2px 8px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    }
+
+    /* ── Shared card ─────────────────────────────────── */
+    .card {
+      background: var(--bg);
+      border-radius: 16px;
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 10px;
+    }
+
+    /* ── Stat cards ──────────────────────────────────── */
+    .stats-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .stat-card {
+      flex: 1;
+      background: var(--bg);
+      border-radius: 16px;
+      border: 0.5px solid var(--border);
+      padding: 14px 14px 12px;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text3);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.8px;
+      line-height: 1;
+    }
+    .stat-unit { font-size: 13px; font-weight: 400; color: var(--text2); letter-spacing: 0; }
+    .stat-sub  { font-size: 11px; color: var(--success); margin-top: 5px; font-weight: 500; }
+    .stat-sub.neutral { color: var(--text2); }
+
+    /* ── History rows ────────────────────────────────── */
+    .hist-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      padding: 14px 16px 12px;
+      border-bottom: 0.5px solid var(--borderLight);
+      letter-spacing: -0.1px;
+    }
+    .hist-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 11px 16px;
+      border-top: 0.5px solid var(--borderLight);
+    }
+    .hist-left { display: flex; align-items: center; gap: 10px; }
+    .hist-dot  { width: 7px; height: 7px; border-radius: 50%; background: var(--primary); flex-shrink: 0; }
+    .hist-dot.old { background: #D1D5DB; }
+    .hist-dose { font-size: 14px; font-weight: 500; color: var(--text); }
+    .hist-date { font-size: 12px; color: var(--text3); font-weight: 400; }
+    .hist-right { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+    .hist-val   { font-size: 14px; font-weight: 500; color: var(--text); }
+    .hist-delta { font-size: 12px; font-weight: 600; }
+
+    /* ── Disclaimer ──────────────────────────────────── */
+    .disclaimer {
+      font-size: 11px;
+      color: var(--text3);
+      text-align: center;
+      margin-top: 4px;
+      margin-bottom: 8px;
+      line-height: 17px;
+    }
+
+    /* ── FAB ─────────────────────────────────────────── */
+    .fab-wrap {
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(to top, var(--bgSec) 68%, transparent);
+      padding: 14px 0 8px;
+      margin: 0 -16px;
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+    .fab {
+      background: var(--primary);
+      border-radius: 15px;
+      padding: 17px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.1px;
+      box-shadow: 0 6px 20px rgba(15,110,86,0.30), 0 2px 6px rgba(15,110,86,0.16);
+      cursor: pointer;
+    }
+
+    /* ══════════════════════════════════════════════════
+       TAB 1 — DOSES
+    ═══════════════════════════════════════════════════ */
+    .doses-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 22px 0 20px;
+    }
+    .doses-h1 {
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.8px;
+      line-height: 1;
+    }
+    .med-badge {
+      display: inline-flex;
+      background: var(--primarySoft);
+      border-radius: 20px;
+      padding: 4px 10px;
+      margin-top: 6px;
+    }
+    .med-badge-text { font-size: 12px; font-weight: 500; color: var(--primary); letter-spacing: 0.1px; }
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(15,110,86,0.28);
+    }
+
+    /* Hero card */
+    .hero {
+      background: linear-gradient(145deg, #1D9E75 0%, #0F6E56 55%, #0A5240 100%);
+      border-radius: 22px;
+      padding: 22px 22px 18px;
+      margin-bottom: 10px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 10px 32px rgba(15,110,86,0.34),
+        0 3px 8px rgba(15,110,86,0.20);
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50px; right: -50px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 50%;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -70px; left: -24px;
+      width: 180px; height: 180px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+    }
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-left { flex: 1; min-width: 0; }
+    .hero-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 0.9px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .hero-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.6px;
+      line-height: 1;
+    }
+    .hero-next-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      margin-top: 5px;
+      font-weight: 400;
+    }
+    /* PK pills (frosted glass) */
+    .hero-pills {
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 11px;
+      border: 0.5px solid rgba(255,255,255,0.22);
+      padding: 6px 8px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .hero-pill { text-align: center; }
+    .hero-pill-val {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+      display: block;
+      letter-spacing: -0.2px;
+    }
+    .hero-pill-val.dim { color: rgba(255,255,255,0.50); font-weight: 600; }
+    .hero-pill-lbl {
+      font-size: 7.5px;
+      color: rgba(255,255,255,0.55);
+      display: block;
+      margin-top: 2px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .hero-pill-arr {
+      font-size: 9px;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 11px;
+      flex-shrink: 0;
+    }
+    /* SVG mini chart */
+    .hero-chart {
+      position: relative;
+      z-index: 1;
+      margin: 14px 0 10px;
+    }
+    .hero-chart svg { display: block; width: 100%; }
+    /* Footer */
+    .hero-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-foot-l {
+      font-size: 11px;
+      color: rgba(255,255,255,0.55);
+      font-weight: 400;
+    }
+    .hero-foot-r {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .hero-foot-r::before {
+      content: '';
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.65);
+    }
+
+    /* Chart card */
+    .chart-card {
+      background: var(--bg);
+      border-radius: 16px;
+      border: 0.5px solid var(--border);
+      padding: 16px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+    .chart-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2px;
+    }
+    .chart-title { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
+    .chart-sub   { font-size: 11px; color: var(--text3); margin-top: 2px; margin-bottom: 14px; }
+    .chart-ss-label { font-size: 9px; font-weight: 600; color: var(--text3); letter-spacing: 0.5px; }
+    .chart-ss-val   { font-size: 16px; font-weight: 700; color: var(--primary); letter-spacing: -0.3px; line-height: 1.2; text-align: right; }
+    .chart-legend { display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; row-gap: 4px; }
+    .legend-item  { display: flex; align-items: center; gap: 5px; }
+    .legend-dot   { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .legend-label { font-size: 11px; color: var(--text2); font-weight: 500; }
+    .chart-footer-strip {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 0.5px solid var(--borderLight);
+    }
+    .chart-meta-txt { font-size: 11px; color: var(--text3); }
+    .chart-meta-val { font-size: 11px; color: var(--primary); font-weight: 600; }
+
+    /* ══════════════════════════════════════════════════
+       TAB 2 — PESO
+    ═══════════════════════════════════════════════════ */
+    .peso-h1 {
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.8px;
+      padding: 22px 0 20px;
+    }
+    .input-card {
+      display: flex;
+      gap: 8px;
+      background: var(--bg);
+      border-radius: 16px;
+      border: 0.5px solid var(--border);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .input-field {
+      flex: 1;
+      font-size: 16px;
+      color: var(--text);
+      background: none;
+      border: none;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .input-field::placeholder { color: var(--text3); }
+    .save-btn {
+      background: var(--primary);
+      border-radius: 10px;
+      padding: 9px 16px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.1px;
+    }
+
+    /* ══════════════════════════════════════════════════
+       TAB 3 — MAIS
+    ═══════════════════════════════════════════════════ */
+    .mais-h1 {
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.8px;
+      padding: 22px 0 20px;
+    }
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text3);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      margin-top: 8px;
+    }
+    .med-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 0.5px solid var(--borderLight);
+      cursor: pointer;
+    }
+    .med-row:last-child { border-bottom: none; }
+    .med-row.active { background: var(--primarySoft); }
+    .med-name { font-size: 15px; font-weight: 600; color: var(--text); }
+    .med-meta { font-size: 12px; color: var(--text2); margin-top: 2px; }
+    .check-badge {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 11px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .soon-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 13px 16px;
+      border-bottom: 0.5px solid var(--borderLight);
+    }
+    .soon-row:last-child { border-bottom: none; }
+    .soon-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #D1D5DB;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .soon-label { font-size: 14px; font-weight: 500; color: var(--text2); }
+    .soon-desc  { font-size: 12px; color: var(--text3); margin-top: 2px; line-height: 1.4; }
+    .disclaimer-card {
+      background: var(--bg);
+      border-radius: 16px;
+      border: 0.5px solid var(--border);
+      padding: 16px;
+      margin-top: 8px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .disclaimer-title { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+    .disclaimer-text  { font-size: 11px; color: var(--text3); line-height: 17px; }
+
+    /* ══════════════════════════════════════════════════
+       TAB 4 — COMIDA
+    ═══════════════════════════════════════════════════ */
+    .food-h1 {
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.8px;
+      padding: 22px 0 4px;
+    }
+    .food-date {
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 14px;
+      font-weight: 400;
+    }
+    .macro-card {
+      background: var(--bg);
+      border-radius: 16px;
+      border: 0.5px solid var(--border);
+      padding: 16px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+    .macro-row  { display: flex; align-items: center; gap: 20px; }
+    .macro-cal-val {
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.8px;
+      line-height: 1;
+    }
+    .macro-cal-label { font-size: 12px; color: var(--text2); font-weight: 500; margin-top: 5px; }
+    .macro-bars { flex: 1; display: flex; flex-direction: column; gap: 9px; }
+    .macro-bar-row { display: flex; align-items: center; gap: 8px; }
+    .macro-name  { font-size: 11px; font-weight: 500; color: var(--text2); width: 52px; flex-shrink: 0; }
+    .macro-track { flex: 1; height: 4px; background: #F3F4F6; border-radius: 3px; overflow: hidden; }
+    .macro-fill  { height: 4px; border-radius: 3px; }
+    .macro-fill.prot  { background: var(--primary); }
+    .macro-fill.carbs { background: #F59E0B; }
+    .macro-fill.fat   { background: #60A5FA; }
+    .macro-val { font-size: 11px; font-weight: 600; color: var(--text); width: 30px; text-align: right; flex-shrink: 0; }
+
+    /* Food action buttons */
+    .food-actions { display: flex; gap: 8px; margin-bottom: 10px; }
+    .food-btn-manual {
+      flex: 1;
+      background: var(--primarySoft);
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.1px;
+    }
+    .food-btn-ai {
+      flex: 1;
+      background: #111827;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      letter-spacing: 0.1px;
+    }
+    .pro-badge {
+      background: linear-gradient(135deg, #F59E0B, #EF4444);
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-size: 9px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.4px;
+    }
+
+    /* Meal rows */
+    .meal-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-top: 0.5px solid var(--borderLight);
+    }
+    .meal-icon { font-size: 20px; flex-shrink: 0; width: 28px; text-align: center; }
+    .meal-info { flex: 1; }
+    .meal-name { font-size: 14px; font-weight: 600; color: var(--text); }
+    .meal-desc { font-size: 12px; color: var(--text2); margin-top: 1px; }
+    .meal-kcal { font-size: 13px; font-weight: 600; color: var(--text2); white-space: nowrap; }
+    .meal-add  {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--primarySoft);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; line-height: 1;
+      color: var(--primary);
+      font-weight: 400;
+    }
+
+    /* Bio Resposta */
+    .health-monitor {
+      background: var(--bg);
+      border-radius: 16px;
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 10px;
+    }
+    .hm-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+    }
+    /* VFC */
+    .hrv-card {
+      background: var(--bg);
+      border-radius: 16px;
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 10px;
+    }
+    /* ── Stacked Bar Chart (BodyLevelChart) ─────────── */
+    .bar-card {
+      background: var(--bg);
+      border-radius: 16px;
+      border: 0.5px solid var(--border);
+      padding: 16px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+    .bar-card-title { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
+    .bar-card-sub   { font-size: 12px; color: var(--text3); margin-top: 2px; margin-bottom: 12px; }
+    .bar-legend { display: flex; gap: 14px; margin-bottom: 12px; }
+    .bar-legend-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; margin-top: 2px; }
+    .bar-legend-lbl { font-size: 11px; color: var(--text2); font-weight: 500; }
+
+    .bar-chart-area {
+      position: relative;
+      height: 130px;
+      padding-left: 26px;
+    }
+    .bca-grid {
+      position: absolute; left: 0; right: 0;
+      display: flex; align-items: center; pointer-events: none;
+    }
+    .bca-grid-lbl {
+      font-size: 9px; color: var(--text3); font-family: 'Inter', sans-serif;
+      width: 22px; text-align: right; flex-shrink: 0; margin-right: 4px;
+    }
+    .bca-grid-line { flex: 1; height: 0.5px; background: #F3F4F6; }
+    .bca-grid-line.ss { background: rgba(15,110,86,0.25); }
+
+    .bar-cols {
+      position: absolute; left: 26px; right: 0; top: 0; bottom: 0;
+      display: flex; align-items: flex-end; gap: 14px;
+    }
+    .bc { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; height: 100%; }
+    .bc-val  { font-size: 10px; font-weight: 600; color: var(--text); flex-shrink: 0; }
+    .bc-stack {
+      flex: 1; width: 100%; min-height: 0;
+      display: flex; flex-direction: column-reverse;
+      border-radius: 3px 3px 0 0; overflow: hidden;
+      background: #F9FAFB;
+    }
+    .bc-seg-fresh    { width: 100%; background: #0F6E56; flex-shrink: 0; }
+    .bc-seg-residual { width: 100%; background: #85B7EB; flex-shrink: 0; }
+    .bc-lbl { font-size: 10px; font-weight: 500; color: var(--text2); flex-shrink: 0; }
+
+    .bc.active .bc-val { color: var(--primary); font-weight: 700; }
+    .bc.active .bc-lbl { color: var(--primary); font-weight: 600; }
+    .bc.active .bc-stack { box-shadow: 0 2px 10px rgba(15,110,86,0.22); }
+
+    .bc.proj { opacity: 0.40; }
+    .bc.proj .bc-seg-fresh    { background: repeating-linear-gradient(45deg, #0F6E56, #0F6E56 2px, #E6F4F0 2px, #E6F4F0 5px); }
+    .bc.proj .bc-seg-residual { background: repeating-linear-gradient(45deg, #85B7EB, #85B7EB 2px, #EBF3FB 2px, #EBF3FB 5px); }
+
+    .bar-footer {
+      display: flex; justify-content: space-between;
+      margin-top: 10px; padding-top: 10px;
+      border-top: 0.5px solid var(--borderLight);
+    }
+    .bar-footer-txt { font-size: 11px; color: var(--text3); }
+    .bar-footer-val { font-size: 11px; color: var(--primary); font-weight: 600; }
+
+    .hrv-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 16px 16px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="phone">
+  <!-- Dynamic Island -->
+  <div class="di"></div>
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <span class="sb-time">9:41</span>
+    <div class="sb-icons">
+      <!-- Signal bars -->
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="#111827">
+        <rect x="0"   y="7.5" width="3" height="4.5" rx="0.8" opacity="0.32"/>
+        <rect x="4.5" y="5"   width="3" height="7"   rx="0.8" opacity="0.52"/>
+        <rect x="9"   y="2"   width="3" height="10"  rx="0.8" opacity="0.72"/>
+        <rect x="13.5" y="0"  width="3" height="12"  rx="0.8"/>
+      </svg>
+      <!-- Wifi -->
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="#111827" stroke-width="1.8" stroke-linecap="round">
+        <path d="M1 4C3.5 1.5 7.5 0 8 0s4.5 1.5 7 4"/>
+        <path d="M3.5 6.5C5 5 6.5 4.2 8 4.2s3 .8 4.5 2.3"/>
+        <path d="M6 9C6.6 8.4 7.3 8 8 8s1.4.4 2 1"/>
+        <circle cx="8" cy="11.2" r="0.85" fill="#111827" stroke="none"/>
+      </svg>
+      <!-- Battery -->
+      <svg width="26" height="13" viewBox="0 0 26 13" fill="none">
+        <rect x="0.75" y="0.75" width="20.5" height="11.5" rx="3.5" stroke="#111827" stroke-width="1.5"/>
+        <rect x="2.5" y="2.5" width="14.5" height="8" rx="2" fill="#111827"/>
+        <path d="M22.5 4.5v4a2 2 0 000-4z" fill="#111827" opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- SCREEN -->
+  <div class="screen">
+
+    <!-- ═══════════════════ TAB 1: DOSES ═══════════════════ -->
+    <div class="tab-panel active" id="tab-doses">
+
+      <div class="doses-header">
+        <div>
+          <div class="doses-h1">Steady</div>
+          <div class="med-badge">
+            <span class="med-badge-text">Tirzepatida · Mounjaro</span>
+          </div>
+        </div>
+        <div class="avatar">A</div>
+      </div>
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-top">
+          <div class="hero-left">
+            <div class="hero-label">Próxima Injeção</div>
+            <div class="hero-value" id="hero-days">—</div>
+            <div class="hero-next-sub" id="hero-next-label">—</div>
+          </div>
+          <div class="hero-pills">
+            <div class="hero-pill">
+              <span class="hero-pill-val" id="val-hoje">—</span>
+              <span class="hero-pill-lbl">Hoje</span>
+            </div>
+            <span class="hero-pill-arr">→</span>
+            <div class="hero-pill">
+              <span class="hero-pill-val" id="val-amanha">—</span>
+              <span class="hero-pill-lbl">Amanhã</span>
+            </div>
+            <span class="hero-pill-arr">→</span>
+            <div class="hero-pill">
+              <span class="hero-pill-val dim" id="val-proxima">—</span>
+              <span class="hero-pill-lbl">Próx. dose</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mini PK SVG (JS-generated) -->
+        <div class="hero-chart">
+          <svg id="hero-svg" width="100%" viewBox="0 0 310 62" style="display:block;"></svg>
+        </div>
+
+        <div class="hero-footer">
+          <span class="hero-foot-l" id="hero-last-label">—</span>
+          <span class="hero-foot-r" id="hero-next-date-label">—</span>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">No corpo agora</div>
+          <div class="stat-value">6.2<span class="stat-unit"> mg</span></div>
+          <div class="stat-sub">↗ SS 8.0 mg</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Peso actual</div>
+          <div class="stat-value">89.1<span class="stat-unit"> kg</span></div>
+          <div class="stat-sub">↓ −4.2 kg total</div>
+        </div>
+      </div>
+
+      <!-- Concentration chart -->
+      <div class="chart-card">
+        <div class="chart-head">
+          <div>
+            <div class="chart-title">Medicamento no corpo</div>
+            <div class="chart-sub">Curva PK: pico após injeção e decaimento semanal (mg)</div>
+          </div>
+        </div>
+
+        <svg width="100%" viewBox="0 0 340 185" fill="none">
+          <defs>
+            <linearGradient id="ag2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#0F6E56" stop-opacity="0.14"/>
+              <stop offset="100%" stop-color="#0F6E56" stop-opacity="0.01"/>
+            </linearGradient>
+            <linearGradient id="ag2proj" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#0F6E56" stop-opacity="0.06"/>
+              <stop offset="100%" stop-color="#0F6E56" stop-opacity="0.01"/>
+            </linearGradient>
+          </defs>
+
+          <!-- Y labels (de 2 em 2, 0→12) -->
+          <text x="22" y="23"  font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="end">12</text>
+          <text x="22" y="45"  font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="end">10</text>
+          <text x="22" y="67"  font-size="9" fill="#0F6E56" font-family="Inter" text-anchor="end" font-weight="700">8</text>
+          <text x="22" y="89"  font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="end">6</text>
+          <text x="22" y="111" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="end">4</text>
+          <text x="22" y="133" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="end">2</text>
+          <text x="22" y="155" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="end">0</text>
+
+          <!-- Grid lines -->
+          <line x1="26" y1="20"  x2="330" y2="20"  stroke="#F3F4F6" stroke-width="0.5"/>
+          <line x1="26" y1="42"  x2="330" y2="42"  stroke="#F3F4F6" stroke-width="0.5"/>
+          <line x1="26" y1="86"  x2="330" y2="86"  stroke="#F3F4F6" stroke-width="0.5"/>
+          <line x1="26" y1="108" x2="330" y2="108" stroke="#F3F4F6" stroke-width="0.5"/>
+          <line x1="26" y1="130" x2="330" y2="130" stroke="#F3F4F6" stroke-width="0.5"/>
+          <line x1="26" y1="155" x2="330" y2="155" stroke="#F3F4F6" stroke-width="1"/>
+
+          <!-- Steady state line at 8mg (y=64) — verde tracejado + label SS -->
+          <line x1="26" y1="64" x2="316" y2="64" stroke="#0F6E56" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.55"/>
+          <text x="322" y="67" font-size="8" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="700">SS</text>
+
+          <!-- Area fill solid (S1 → hoje) -->
+          <path d="M 45,155 L 45,99 C 58,112 76,130 93,134 L 98,77 C 112,90 132,118 153,125 L 158,70 C 172,83 193,114 213,121 L 218,66 C 231,79 253,102 268,101 L 268,155 Z"
+            fill="url(#ag2)"/>
+          <!-- Area fill projected (hoje → S5) -->
+          <path d="M 268,155 L 268,101 C 282,111 302,120 308,121 L 308,64 L 322,69 L 322,155 Z"
+            fill="url(#ag2proj)"/>
+
+          <!-- Curva principal S1→hoje (sólido) -->
+          <path d="M 45,99 C 58,112 76,130 93,134 L 98,77 C 112,90 132,118 153,125 L 158,70 C 172,83 193,114 213,121 L 218,66 C 231,79 253,102 268,101"
+            stroke="#0F6E56" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+
+          <!-- Curva projetada hoje→S5 (tracejado mais fraco) -->
+          <path d="M 268,101 C 282,111 302,120 308,121 L 308,64 C 314,67 318,68 322,69"
+            stroke="#0F6E56" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="4 3" opacity="0.40"/>
+
+          <!-- Linha vertical "Hoje" tracejada -->
+          <line x1="268" y1="64" x2="268" y2="155" stroke="#0F6E56" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.30"/>
+
+          <!-- Dots nos picos (S1–S4) -->
+          <circle cx="45"  cy="99"  r="3.5" fill="#0F6E56" stroke="white" stroke-width="1.5"/>
+          <circle cx="98"  cy="77"  r="3.5" fill="#0F6E56" stroke="white" stroke-width="1.5"/>
+          <circle cx="158" cy="70"  r="3.5" fill="#0F6E56" stroke="white" stroke-width="1.5"/>
+          <circle cx="218" cy="66"  r="4"   fill="#0F6E56" stroke="white" stroke-width="2"/>
+
+          <!-- Valores nos picos -->
+          <text x="45"  y="93"  font-size="8.5" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="700">5.0</text>
+          <text x="98"  y="71"  font-size="8.5" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="700">6.9</text>
+          <text x="158" y="64"  font-size="8.5" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="700">7.6</text>
+          <text x="218" y="59"  font-size="8.5" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="700">7.9</text>
+
+          <!-- Hoje: dot branco + valor 4.8 mg -->
+          <circle cx="268" cy="101" r="5" fill="#fff" stroke="#0F6E56" stroke-width="2"/>
+          <text x="268" y="95" font-size="8" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="600">4.8 mg</text>
+
+          <!-- S5 projetado: dot vazio -->
+          <circle cx="308" cy="64" r="3.5" fill="none" stroke="#0F6E56" stroke-width="1.5" opacity="0.45"/>
+          <text x="308" y="58" font-size="8" fill="#9CA3AF" font-family="Inter" text-anchor="middle" font-weight="600">8.0</text>
+
+          <!-- X labels -->
+          <text x="45"  y="169" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="middle">S1</text>
+          <text x="98"  y="169" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="middle">S2</text>
+          <text x="158" y="169" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="middle">S3</text>
+          <text x="218" y="169" font-size="9" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="700">S4</text>
+          <text x="268" y="169" font-size="9" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="600">Hoje</text>
+          <text x="308" y="169" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="middle">S5</text>
+
+          <!-- Legenda inline -->
+          <circle cx="36" cy="180" r="3" fill="#0F6E56"/>
+          <text x="42" y="183" font-size="8.5" fill="#6B7280" font-family="Inter">Nível pós-injeção</text>
+          <circle cx="138" cy="180" r="4" fill="white" stroke="#0F6E56" stroke-width="1.5"/>
+          <text x="145" y="183" font-size="8.5" fill="#6B7280" font-family="Inter">Hoje (4.8 mg)</text>
+          <line x1="226" y1="180" x2="239" y2="180" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="3 2" opacity="0.45"/>
+          <text x="243" y="183" font-size="8.5" fill="#9CA3AF" font-family="Inter">Projetado</text>
+        </svg>
+
+        <div class="chart-footer-strip">
+          <span class="chart-meta-txt">t½ = 5 dias · Tirzepatida</span>
+          <span class="chart-meta-val">↑ 58% do steady state</span>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="card">
+        <div class="hist-title">Referência injeções</div>
+        <div class="hist-row">
+          <div class="hist-left"><div class="hist-dot"></div><span class="hist-dose">5 mg · Abdómen</span></div>
+          <span class="hist-date">24 mai 26</span>
+        </div>
+        <div class="hist-row">
+          <div class="hist-left"><div class="hist-dot old"></div><span class="hist-dose">5 mg · Abdómen</span></div>
+          <span class="hist-date">17 mai 26</span>
+        </div>
+        <div class="hist-row">
+          <div class="hist-left"><div class="hist-dot old"></div><span class="hist-dose">5 mg · Abdómen</span></div>
+          <span class="hist-date">10 mai 26</span>
+        </div>
+        <div class="hist-row">
+          <div class="hist-left"><div class="hist-dot old"></div><span class="hist-dose">5 mg · Coxa</span></div>
+          <span class="hist-date">3 mai 26</span>
+        </div>
+      </div>
+
+      <p class="disclaimer">Estimativa educativa (t½ ≈ 5 dias). Não é aconselhamento médico.</p>
+
+      <div class="fab-wrap">
+        <div class="fab">+ Registar injeção</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ TAB 2: PESO ═══════════════════ -->
+    <div class="tab-panel" id="tab-peso">
+      <div class="peso-h1">Peso</div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Actual</div>
+          <div class="stat-value">92.3<span class="stat-unit"> kg</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Variação total</div>
+          <div class="stat-value" style="color:var(--success)">−2.2<span class="stat-unit"> kg</span></div>
+        </div>
+      </div>
+      <div class="input-card">
+        <input class="input-field" type="number" placeholder="Novo peso em kg" />
+        <button class="save-btn">Guardar</button>
+      </div>
+      <div class="card">
+        <div class="hist-title">Histórico</div>
+        <div class="hist-row">
+          <div class="hist-left"><div class="hist-dot"></div><span class="hist-val">92.3 kg</span></div>
+          <div class="hist-right">
+            <span class="hist-delta" style="color:var(--success)">−0.8</span>
+            <span class="hist-date">24 mai</span>
+          </div>
+        </div>
+        <div class="hist-row">
+          <div class="hist-left"><div class="hist-dot old"></div><span class="hist-val">93.1 kg</span></div>
+          <div class="hist-right">
+            <span class="hist-delta" style="color:var(--success)">−0.7</span>
+            <span class="hist-date">17 mai</span>
+          </div>
+        </div>
+        <div class="hist-row">
+          <div class="hist-left"><div class="hist-dot old"></div><span class="hist-val">93.8 kg</span></div>
+          <div class="hist-right">
+            <span class="hist-delta" style="color:var(--success)">−0.7</span>
+            <span class="hist-date">10 mai</span>
+          </div>
+        </div>
+        <div class="hist-row">
+          <div class="hist-left"><div class="hist-dot old"></div><span class="hist-val">94.5 kg</span></div>
+          <div class="hist-right"><span class="hist-date">3 mai</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ TAB 3: MAIS ═══════════════════ -->
+    <div class="tab-panel" id="tab-mais">
+      <div class="mais-h1">Mais</div>
+      <div class="section-label">Medicamento</div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="med-row active">
+          <div><div class="med-name">Tirzepatida</div><div class="med-meta">Mounjaro · t½ 5d · ×1.6 acumulação</div></div>
+          <div class="check-badge">✓</div>
+        </div>
+        <div class="med-row">
+          <div><div class="med-name">Semaglutida</div><div class="med-meta">Ozempic / Wegovy · t½ 7d · ×2.0 acumulação</div></div>
+        </div>
+        <div class="med-row">
+          <div><div class="med-name">Liraglutida</div><div class="med-meta">Victoza / Saxenda · t½ 1d · ×1.1 acumulação</div></div>
+        </div>
+      </div>
+      <div class="section-label">Em breve</div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="soon-row"><div class="soon-dot"></div><div><div class="soon-label">Curva intra-semana</div><div class="soon-desc">Gráfico G2 do nível ao longo dos 7 dias</div></div></div>
+        <div class="soon-row"><div class="soon-dot"></div><div><div class="soon-label">Lembretes</div><div class="soon-desc">Notificação no dia da injeção</div></div></div>
+        <div class="soon-row"><div class="soon-dot"></div><div><div class="soon-label">Água</div><div class="soon-desc">Registo diário de hidratação</div></div></div>
+        <div class="soon-row"><div class="soon-dot"></div><div><div class="soon-label">Efeitos secundários</div><div class="soon-desc">Diário de sintomas e tolerância</div></div></div>
+        <div class="soon-row"><div class="soon-dot"></div><div><div class="soon-label">Foto-calorias</div><div class="soon-desc">IA — analisa refeições por fotografia (Premium)</div></div></div>
+      </div>
+      <div class="disclaimer-card">
+        <div class="disclaimer-title">Aviso legal</div>
+        <div class="disclaimer-text">Steady é uma ferramenta de bem-estar. Não é dispositivo médico, não diagnostica nem prescreve. App independente, não afiliada a qualquer farmacêutica.<br><br>Consulte sempre o seu médico antes de alterar dose ou medicação.</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ TAB 4: COMIDA ═══════════════════ -->
+    <div class="tab-panel" id="tab-comida">
+      <div class="food-h1">Comida</div>
+      <div class="food-date">Hoje · sábado, 24 mai</div>
+
+      <!-- Macros -->
+      <div class="macro-card">
+        <div class="macro-row">
+          <div>
+            <div class="macro-cal-val">1 240</div>
+            <div class="macro-cal-label">kcal hoje</div>
+          </div>
+          <div class="macro-bars">
+            <div class="macro-bar-row">
+              <span class="macro-name">Proteína</span>
+              <div class="macro-track"><div class="macro-fill prot" style="width:68%"></div></div>
+              <span class="macro-val">82g</span>
+            </div>
+            <div class="macro-bar-row">
+              <span class="macro-name">Carbs</span>
+              <div class="macro-track"><div class="macro-fill carbs" style="width:54%"></div></div>
+              <span class="macro-val">135g</span>
+            </div>
+            <div class="macro-bar-row">
+              <span class="macro-name">Gordura</span>
+              <div class="macro-track"><div class="macro-fill fat" style="width:38%"></div></div>
+              <span class="macro-val">42g</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="food-actions">
+        <button class="food-btn-manual">+ Manual</button>
+        <button class="food-btn-ai">📷 Foto IA <span class="pro-badge">PRO</span></button>
+      </div>
+
+      <!-- Refeições -->
+      <div class="card">
+        <div class="hist-title">Refeições de hoje</div>
+        <div class="meal-row">
+          <span class="meal-icon">🌅</span>
+          <div class="meal-info">
+            <div class="meal-name">Pequeno-almoço</div>
+            <div class="meal-desc">Aveia · iogurte · banana</div>
+          </div>
+          <span class="meal-kcal">420 kcal</span>
+        </div>
+        <div class="meal-row">
+          <span class="meal-icon">☀️</span>
+          <div class="meal-info">
+            <div class="meal-name">Almoço</div>
+            <div class="meal-desc">Frango · arroz · salada</div>
+          </div>
+          <span class="meal-kcal">580 kcal</span>
+        </div>
+        <div class="meal-row">
+          <span class="meal-icon">🌆</span>
+          <div class="meal-info">
+            <div class="meal-name">Lanche</div>
+            <div class="meal-desc">Maçã · amêndoas</div>
+          </div>
+          <span class="meal-kcal">240 kcal</span>
+        </div>
+        <div class="meal-row">
+          <span class="meal-icon">🌙</span>
+          <div class="meal-info">
+            <div class="meal-name" style="color:var(--text3)">Jantar</div>
+            <div class="meal-desc" style="color:var(--text3)">Não registado</div>
+          </div>
+          <div class="meal-add">+</div>
+        </div>
+      </div>
+
+      <!-- Bio Resposta -->
+      <div class="health-monitor">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 16px 8px;">
+          <span class="hm-title">Bio Resposta</span>
+          <svg width="48" height="48" viewBox="0 0 52 52">
+            <defs>
+              <linearGradient id="hmrg" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0%"   stop-color="#818CF8"/>
+                <stop offset="30%"  stop-color="#0F6E56"/>
+                <stop offset="65%"  stop-color="#FB923C"/>
+                <stop offset="100%" stop-color="#34D399"/>
+              </linearGradient>
+            </defs>
+            <circle cx="26" cy="26" r="21" fill="none" stroke="#F3F4F6" stroke-width="4"/>
+            <circle cx="26" cy="26" r="21" fill="none" stroke="url(#hmrg)" stroke-width="4"
+              stroke-dasharray="95 132" stroke-linecap="round" transform="rotate(-90 26 26)"/>
+          </svg>
+        </div>
+        <div style="position:relative; height:22px; margin:0 16px 4px;">
+          <span style="position:absolute; left:49px;  top:2px; font-size:8px;  color:#9CA3AF;">🔒</span>
+          <span style="position:absolute; left:58px;  top:4px; font-size:11px; filter:grayscale(1) brightness(0.6);">🌙</span>
+          <span style="position:absolute; left:126px; top:4px; font-size:11px; filter:grayscale(1) brightness(0.6);">🥣</span>
+          <span style="position:absolute; left:162px; top:4px; font-size:11px; filter:grayscale(1) brightness(0.6);">🔥</span>
+          <span style="position:absolute; left:202px; top:4px; font-size:11px; filter:grayscale(1) brightness(0.6);">🍱</span>
+          <span style="position:absolute; left:246px; top:2px; font-size:8px;  color:#9CA3AF;">🔒</span>
+          <span style="position:absolute; left:256px; top:4px; font-size:11px; filter:grayscale(1) brightness(0.6);">⚡</span>
+        </div>
+        <svg width="100%" viewBox="0 0 330 95" style="display:block;">
+          <defs>
+            <linearGradient id="hmcg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%"   stop-color="#0F6E56" stop-opacity="0.14"/>
+              <stop offset="100%" stop-color="#0F6E56" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <rect x="20" y="5" width="108" height="72" fill="rgba(129,140,248,0.05)" rx="2"/>
+          <path d="M 20 66 C 50 67,88 70,128 70 C 146 70,150 52,175 30 C 184 24,208 38,226 43 C 246 48,268 36,298 40 L 298 84 L 20 84 Z"
+            fill="url(#hmcg)"/>
+          <path d="M 20 66 C 50 67,88 70,128 70 C 146 70,150 52,175 30 C 184 24,208 38,226 43 C 246 48,268 36,298 40"
+            fill="none" stroke="#0F6E56" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="298" y1="5" x2="298" y2="84" stroke="#0F6E56" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.28"/>
+          <text x="20"  y="93" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="middle">00:00</text>
+          <text x="298" y="93" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="end">17:27</text>
+        </svg>
+      </div>
+
+      <!-- VFC Gauge -->
+      <div class="hrv-card">
+        <div class="hrv-title">Variabilidade Freq. Cardíaca</div>
+        <svg width="100%" viewBox="0 0 358 208" style="display:block;">
+          <defs>
+            <linearGradient id="gg" x1="0" y1="0.5" x2="1" y2="0.5">
+              <stop offset="0%"   stop-color="#29B6F6"/>
+              <stop offset="28%"  stop-color="#00E5FF"/>
+              <stop offset="55%"  stop-color="#AEEA00"/>
+              <stop offset="78%"  stop-color="#FFA000"/>
+              <stop offset="100%" stop-color="#E65100"/>
+            </linearGradient>
+            <filter id="ag">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <linearGradient id="ng" gradientUnits="userSpaceOnUse" x1="139" y1="128" x2="82" y2="101">
+              <stop offset="0%"   stop-color="white" stop-opacity="0"/>
+              <stop offset="100%" stop-color="white" stop-opacity="1"/>
+            </linearGradient>
+            <filter id="ns">
+              <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="rgba(0,0,0,0.22)"/>
+            </filter>
+          </defs>
+          <path d="M 97 196 A 95 95 0 1 1 261 196" fill="none" stroke="#F3F4F6" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 97 196 A 95 95 0 1 1 261 196" fill="none" stroke="url(#gg)" stroke-width="8" stroke-linecap="round" filter="url(#ag)" opacity="0.18"/>
+          <path d="M 97 196 A 95 95 0 1 1 261 196" fill="none" stroke="url(#gg)" stroke-width="4" stroke-linecap="round"/>
+          <line x1="139" y1="128" x2="82" y2="101" stroke="url(#ng)" stroke-width="4" stroke-linecap="round" filter="url(#ns)"/>
+          <text x="179" y="148" font-size="40" font-weight="700" fill="#111827" text-anchor="middle" font-family="Inter, sans-serif" letter-spacing="-1">0.7</text>
+          <text x="179" y="165" font-size="11" font-weight="600" fill="#29B6F6" text-anchor="middle" letter-spacing="1.5" font-family="Inter, sans-serif">BAIXO</text>
+          <text x="179" y="180" font-size="11" fill="#9CA3AF" text-anchor="middle" font-family="Inter, sans-serif">17:27</text>
+          <text x="84"  y="204" font-size="10" fill="#9CA3AF" text-anchor="middle" font-family="Inter, sans-serif">0.0</text>
+          <text x="274" y="204" font-size="10" fill="#9CA3AF" text-anchor="middle" font-family="Inter, sans-serif">3.0</text>
+        </svg>
+      </div>
+
+      <div style="height:8px;"></div>
+    </div>
+
+  </div><!-- /screen -->
+
+  <!-- Tab bar -->
+  <div class="tabbar">
+    <button class="tab-btn active" id="btn-doses" onclick="switchTab('doses')">
+      <span class="t-icon">💉</span>
+      <span class="t-label">Doses</span>
+    </button>
+    <button class="tab-btn" id="btn-comida" onclick="switchTab('comida')">
+      <span class="t-icon">🥗</span>
+      <span class="t-label">Comida</span>
+    </button>
+    <button class="tab-btn" id="btn-peso" onclick="switchTab('peso')">
+      <span class="t-icon">⚖️</span>
+      <span class="t-label">Peso</span>
+    </button>
+    <button class="tab-btn" id="btn-mais" onclick="switchTab('mais')">
+      <span class="t-icon">⚙️</span>
+      <span class="t-label">Mais</span>
+    </button>
+  </div>
+</div>
+
+<script>
+  /* ── Tab switching ── */
+  function switchTab(name) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('btn-' + name).classList.add('active');
+    document.querySelector('.screen').scrollTop = 0;
+  }
+
+  /* ═══════════════════════════════════════════════════
+     PK ENGINE — Hero Card
+     Q(t) = Q0 · 0.5^(t / T_HALF)
+     Acumulação semanal modelo:
+       S1: 5.0 mg
+       S2: 5.0 × 0.5^(7/5) + 5 ≈ 6.89 mg
+       S3: 6.89 × 0.5^(7/5) + 5 ≈ 7.61 mg
+       S4: 7.61 × 0.5^(7/5) + 5 ≈ 7.90 mg  (Q0)
+  ════════════════════════════════════════════════════ */
+  (function() {
+    const T_HALF   = 5;
+    const NEW_DOSE = 5.0;
+    const Q0       = 7.9;
+
+    const DAYS   = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+    const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+    const lastInj = new Date(2026, 4, 24);
+    const nextInj = new Date(2026, 4, 28);
+
+    function fmtDate(d) { return d.getDate() + ' ' + MONTHS[d.getMonth()]; }
+    function Q(t) { return Q0 * Math.pow(0.5, Math.max(0, t) / T_HALF); }
+
+    const now   = new Date();
+    const msDay = 86400000;
+    const tNow  = (now - lastInj) / msDay;
+    const tSpan = (nextInj - lastInj) / msDay;
+
+    const vHoje    = Q(tNow);
+    const vAmanha  = Q(tNow + 1);
+    const vProxima = Q(tSpan) + NEW_DOSE;
+
+    /* Fill widgets */
+    document.getElementById('val-hoje').textContent    = vHoje.toFixed(1);
+    document.getElementById('val-amanha').textContent  = vAmanha.toFixed(1);
+    document.getElementById('val-proxima').textContent = vProxima.toFixed(1);
+
+    const daysLeft = Math.max(0, Math.ceil((nextInj - now) / msDay));
+    const heroEl   = document.getElementById('hero-days');
+    if      (daysLeft === 0) heroEl.textContent = 'Hoje!';
+    else if (daysLeft === 1) heroEl.textContent = 'Amanhã';
+    else                     heroEl.textContent = daysLeft + ' dias';
+
+    document.getElementById('hero-next-label').textContent =
+      DAYS[nextInj.getDay()] + ', ' + fmtDate(nextInj) + ' · ' + NEW_DOSE.toFixed(1) + ' mg';
+
+    document.getElementById('hero-last-label').textContent      = 'Última: ' + fmtDate(lastInj);
+    document.getElementById('hero-next-date-label').textContent = 'Próxima: ' + fmtDate(nextInj);
+
+    /* ── Draw hero SVG ── */
+    const svg  = document.getElementById('hero-svg');
+    const W = 310, H = 62;
+    const PL = 10, PR = 30, PT = 8, PB = 8;
+
+    function xS(t) { return PL + (t / tSpan) * (W - PL - PR); }
+    const yMax = Q0 * 1.08;
+    function yS(mg) { return H - PB - (mg / yMax) * (H - PT - PB); }
+
+    /* Decay curve: 60 points */
+    const decayPts = [];
+    for (let i = 0; i <= 60; i++) {
+      const t = (i / 60) * tSpan;
+      decayPts.push([xS(t).toFixed(1), yS(Q(t)).toFixed(1)]);
+    }
+    const decayPath = decayPts.map((p, i) => (i === 0 ? 'M ' : 'L ') + p[0] + ',' + p[1]).join(' ');
+
+    /* Preview after next dose (1.5 days solid) */
+    const previewPts  = [];
+    const scaleNext   = vProxima / Q0;
+    for (let i = 0; i <= 20; i++) {
+      const dt = (i / 20) * 1.5;
+      previewPts.push([xS(tSpan + dt).toFixed(1), yS(Q(dt) * scaleNext).toFixed(1)]);
+    }
+    const previewPath = previewPts.map((p, i) => (i === 0 ? 'M ' : 'L ') + p[0] + ',' + p[1]).join(' ');
+
+    const xA = xS(0),     yA = yS(Q0);
+    const xB = xS(tNow),  yB = yS(vHoje);
+    const xC = xS(tSpan), yC = yS(vProxima);
+
+    svg.innerHTML =
+      `<path d="${decayPath}" fill="none" stroke="rgba(255,255,255,0.48)" stroke-width="1.8" stroke-dasharray="5 4" stroke-linecap="round"/>` +
+      `<line x1="${xC}" y1="${yC}" x2="${xC}" y2="${H - 4}" stroke="rgba(255,255,255,0.25)" stroke-width="0.8" stroke-dasharray="3 3"/>` +
+      `<path d="${previewPath}" fill="none" stroke="rgba(255,255,255,0.40)" stroke-width="1.8" stroke-linecap="round"/>` +
+      `<circle cx="${xA}" cy="${yA}" r="5" fill="#fff" opacity="0.90"/>` +
+      (tNow > 0.3 ? `<circle cx="${xB}" cy="${yB}" r="3" fill="#fff" opacity="0.88"/>` : '') +
+      `<circle cx="${xC}" cy="${yC}" r="5" fill="#fff" opacity="0.90"/>`;
+  })();
+</script>
+</body>
+</html>

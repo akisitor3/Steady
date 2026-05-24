@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Steady — Dashboard + Bem-estar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:       #0F6E56;
+      --primary-light: #1D9E75;
+      --primary-soft:  #E6F4F0;
+      --bg:            #FFFFFF;
+      --bg-secondary:  #F5F5F7;
+      --text:          #111827;
+      --text-2:        #6B7280;
+      --text-3:        #9CA3AF;
+      --border:        #E5E7EB;
+      --radius-card:   18px;
+      --shadow-card:   0 1px 4px rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.05);
+      /* mood colours */
+      --c-great:   #D97706;
+      --c-stable:  #0F6E56;
+      --c-tired:   #6D28D9;
+      --c-anxious: #C2410C;
+      --c-bad:     #9D174D;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #E0DDD8;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px 60px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Phone frame ── */
+    .phone {
+      width: 390px;
+      background: var(--bg-secondary);
+      border-radius: 50px;
+      box-shadow:
+        0 0 0 11px #1C1C1E,
+        0 0 0 13px #3A3A3C,
+        0 40px 100px rgba(0,0,0,0.45),
+        0 12px 40px rgba(0,0,0,0.25);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .dynamic-island {
+      position: absolute;
+      top: 14px; left: 50%;
+      transform: translateX(-50%);
+      width: 120px; height: 34px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 10;
+    }
+
+    /* Status bar */
+    .statusbar {
+      padding: 18px 26px 0;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 13px; font-weight: 600; color: var(--text);
+      position: relative; z-index: 1;
+    }
+    .sb-right { display: flex; gap: 6px; align-items: center; font-size: 12px; }
+
+    /* Scroll area */
+    .screen {
+      padding-bottom: 0;
+      max-height: 830px;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .screen::-webkit-scrollbar { display: none; }
+
+    /* ── Page header ── */
+    .page-header {
+      padding: 16px 20px 8px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title {
+      font-size: 26px; font-weight: 700;
+      color: var(--text); letter-spacing: -0.5px;
+    }
+    .page-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--primary-soft);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+    }
+
+    /* ── Scroll content ── */
+    .cards {
+      padding: 4px 14px 16px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+
+    /* ── Generic card ── */
+    .card {
+      background: var(--bg);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      border: 1px solid rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+
+    /* ── Graph card (context) ── */
+    .graph-card-inner { padding: 16px 16px 14px; }
+
+    .graph-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+    .graph-label { font-size: 13px; font-weight: 600; color: var(--text); }
+    .graph-sub   { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+    .graph-value { font-size: 22px; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; }
+    .graph-value span { font-size: 12px; font-weight: 500; }
+
+    /* Mini SVG chart */
+    .chart-area { margin: 0 -4px 12px; }
+
+    .graph-legend {
+      display: flex; gap: 14px;
+      font-size: 10.5px; color: var(--text-3);
+      border-top: 1px solid var(--border);
+      padding-top: 10px; margin-top: 4px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 4px; }
+    .legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .legend-dot.filled  { background: var(--primary); }
+    .legend-dot.hollow  { border: 2px solid var(--primary); background: white; width: 8px; height: 8px; }
+    .legend-dot.dashed  {
+      width: 14px; height: 2px; border-radius: 1px;
+      background: repeating-linear-gradient(90deg,var(--primary) 0,var(--primary) 3px,transparent 3px,transparent 6px);
+    }
+
+    .graph-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 8px;
+      font-size: 11px; color: var(--text-3);
+    }
+    .graph-footer-badge {
+      font-size: 11px; font-weight: 600; color: var(--primary);
+      display: flex; align-items: center; gap: 3px;
+    }
+
+    /* ══════════════════════════════════
+       SINGLE WELLNESS CARD
+    ══════════════════════════════════ */
+    .wellness-card { padding: 0; }
+
+    /* Card top header */
+    .wc-header {
+      padding: 14px 16px 0;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .wc-title-row { display: flex; align-items: center; gap: 8px; }
+    .wc-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: var(--primary-soft);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .wc-title { font-size: 15px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
+    .wc-arrow { color: var(--text-3); }
+
+    /* Divider line inside card */
+    .wc-divider {
+      height: 1px; background: var(--border);
+      margin: 12px 16px 0;
+    }
+
+    /* Section row (Diário / Doto) */
+    .wc-section {
+      padding: 12px 16px 10px;
+    }
+    .wc-section-label {
+      font-size: 11px; font-weight: 500; color: var(--text-3);
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .wc-section-label strong {
+      font-size: 12px; font-weight: 600; color: var(--text-2);
+    }
+
+    /* ── Mood row ── */
+    .mood-row {
+      display: flex; gap: 0;
+      justify-content: space-between;
+    }
+
+    .mood-item {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .mood-face {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: #F3F4F6;
+      border: 2px solid transparent;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+    .mood-face svg { width: 30px; height: 30px; }
+
+    .mood-item:hover .mood-face { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(0,0,0,0.10); }
+
+    /* Selected per mood */
+    .mood-item.selected[data-mood="excelente"] .mood-face {
+      background: #FEF3C7; border-color: var(--c-great);
+      box-shadow: 0 0 0 3px rgba(217,119,6,0.14); transform: translateY(-2px) scale(1.07);
+    }
+    .mood-item.selected[data-mood="estavel"] .mood-face {
+      background: var(--primary-soft); border-color: var(--c-stable);
+      box-shadow: 0 0 0 3px rgba(15,110,86,0.14); transform: translateY(-2px) scale(1.07);
+    }
+    .mood-item.selected[data-mood="cansado"] .mood-face {
+      background: #EDE9FE; border-color: var(--c-tired);
+      box-shadow: 0 0 0 3px rgba(109,40,217,0.12); transform: translateY(-2px) scale(1.07);
+    }
+    .mood-item.selected[data-mood="ansioso"] .mood-face {
+      background: #FFEDD5; border-color: var(--c-anxious);
+      box-shadow: 0 0 0 3px rgba(194,65,12,0.12); transform: translateY(-2px) scale(1.07);
+    }
+    .mood-item.selected[data-mood="enjoado"] .mood-face {
+      background: #FCE7F3; border-color: var(--c-bad);
+      box-shadow: 0 0 0 3px rgba(157,23,77,0.12); transform: translateY(-2px) scale(1.07);
+    }
+
+    .mood-label {
+      font-size: 9.5px; font-weight: 500;
+      color: var(--text-3); text-align: center;
+      transition: color 0.18s, font-weight 0.18s;
+    }
+    .mood-item.selected[data-mood="excelente"] .mood-label { color: var(--c-great); font-weight: 600; }
+    .mood-item.selected[data-mood="estavel"]   .mood-label { color: var(--c-stable); font-weight: 600; }
+    .mood-item.selected[data-mood="cansado"]   .mood-label { color: var(--c-tired);  font-weight: 600; }
+    .mood-item.selected[data-mood="ansioso"]   .mood-label { color: var(--c-anxious);font-weight: 600; }
+    .mood-item.selected[data-mood="enjoado"]   .mood-label { color: var(--c-bad);    font-weight: 600; }
+
+    @keyframes moodPop {
+      0%   { transform: translateY(0) scale(1); }
+      45%  { transform: translateY(-4px) scale(1.13); }
+      75%  { transform: translateY(-2px) scale(1.05); }
+      100% { transform: translateY(-2px) scale(1.07); }
+    }
+    .mood-item.pop .mood-face { animation: moodPop 0.36s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+
+    /* Note input area */
+    .wc-note {
+      margin: 4px 14px 14px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      padding: 11px 14px;
+      display: flex; align-items: center; gap: 10px;
+      border: 1px solid var(--border);
+    }
+    .wc-note-text {
+      flex: 1;
+      font-size: 13px; color: var(--text-3);
+      font-weight: 400;
+    }
+    .wc-note-btn {
+      width: 28px; height: 28px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(15,110,86,0.3);
+    }
+
+    /* ── Register injection button ── */
+    .inject-btn {
+      margin: 4px 14px 14px;
+      background: var(--primary);
+      border-radius: 14px;
+      padding: 16px;
+      text-align: center;
+      font-size: 15px; font-weight: 600; color: white;
+      letter-spacing: -0.2px;
+      box-shadow: 0 4px 16px rgba(15,110,86,0.32);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .inject-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(15,110,86,0.38);
+    }
+
+    /* ── Tab bar ── */
+    .tabbar {
+      background: rgba(255,255,255,0.94);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 10px 0 28px;
+      display: flex; justify-content: space-around;
+    }
+    .tab-item {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      font-size: 10px; font-weight: 500; color: var(--text-3);
+      min-width: 60px; cursor: pointer;
+    }
+    .tab-item.active { color: var(--primary); }
+    .tab-item svg { width: 22px; height: 22px; }
+  </style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="dynamic-island"></div>
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <span>16:52</span>
+    <div class="sb-right">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="#111827">
+        <rect x="0" y="7" width="3" height="5" rx="1"/>
+        <rect x="4.5" y="4.5" width="3" height="7.5" rx="1"/>
+        <rect x="9" y="2" width="3" height="10" rx="1"/>
+        <rect x="13.5" y="0" width="3" height="12" rx="1" opacity="0.3"/>
+      </svg>
+      <span style="font-size:11px;font-weight:600;">WiFi</span>
+      <span style="font-size:11px;font-weight:600;">84%</span>
+    </div>
+  </div>
+
+  <!-- Page header -->
+  <div class="page-header">
+    <span class="page-title">Doses</span>
+    <div class="page-avatar">💊</div>
+  </div>
+
+  <div class="screen">
+    <div class="cards">
+
+      <!-- ── Graph card (context) ── -->
+      <div class="card">
+        <div class="graph-card-inner">
+          <div class="graph-header">
+            <div>
+              <div class="graph-label">Medicamento no corpo</div>
+              <div class="graph-sub">Pico por semana após injeção (mg)</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:10px;font-weight:600;color:var(--text-3);letter-spacing:.5px">STEADY STATE</div>
+              <div class="graph-value">8.0 <span>mg</span></div>
+            </div>
+          </div>
+
+          <!-- SVG Chart -->
+          <div class="chart-area">
+            <svg width="100%" viewBox="0 0 340 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Grid lines -->
+              <line x1="30" y1="10" x2="330" y2="10" stroke="#E5E7EB" stroke-width="0.8"/>
+              <line x1="30" y1="36" x2="330" y2="36" stroke="#E5E7EB" stroke-width="0.8"/>
+              <line x1="30" y1="62" x2="330" y2="62" stroke="#E5E7EB" stroke-width="0.8"/>
+              <line x1="30" y1="88" x2="330" y2="88" stroke="#E5E7EB" stroke-width="0.8"/>
+              <line x1="30" y1="114" x2="330" y2="114" stroke="#E5E7EB" stroke-width="0.8"/>
+              <!-- Y labels -->
+              <text x="24" y="14" font-size="9" fill="#9CA3AF" text-anchor="end">12</text>
+              <text x="24" y="40" font-size="9" fill="#9CA3AF" text-anchor="end">10</text>
+              <text x="24" y="66" font-size="9" fill="#9CA3AF" text-anchor="end">8</text>
+              <text x="24" y="92" font-size="9" fill="#9CA3AF" text-anchor="end">6</text>
+              <text x="24" y="118" font-size="9" fill="#9CA3AF" text-anchor="end">4</text>
+              <!-- Y axis label -->
+              <text x="10" y="75" font-size="8" fill="#9CA3AF" text-anchor="middle" transform="rotate(-90 10 75)">mg</text>
+              <!-- Steady state line -->
+              <line x1="30" y1="62" x2="330" y2="62" stroke="#0F6E56" stroke-width="1" stroke-dasharray="4 3" opacity="0.4"/>
+              <!-- Area fill: S1→S4 peaks and valleys -->
+              <path d="M60,101 L80,114 L110,79 L130,114 L160,71 L180,114 L210,56 L230,88 L260,62"
+                    fill="url(#areaGrad)" stroke="none"/>
+              <defs>
+                <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0F6E56" stop-opacity="0.15"/>
+                  <stop offset="100%" stop-color="#0F6E56" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+              <!-- Main line -->
+              <polyline points="60,101 80,114 110,79 130,114 160,71 180,114 210,56 230,88 260,62"
+                        stroke="#0F6E56" stroke-width="2.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- Projected dashed line -->
+              <polyline points="260,62 280,88 310,44"
+                        stroke="#0F6E56" stroke-width="1.8" fill="none" stroke-dasharray="4 3" opacity="0.6"/>
+              <!-- Data points -->
+              <circle cx="60"  cy="101" r="4" fill="#0F6E56"/>
+              <circle cx="110" cy="79"  r="4" fill="#0F6E56"/>
+              <circle cx="160" cy="71"  r="4" fill="#0F6E56"/>
+              <circle cx="210" cy="56"  r="4" fill="#0F6E56"/>
+              <!-- Today open circle -->
+              <circle cx="260" cy="62" r="5" stroke="#0F6E56" stroke-width="2.2" fill="white"/>
+              <!-- Next projected -->
+              <circle cx="310" cy="44" r="4.5" stroke="#0F6E56" stroke-width="1.8" fill="white" opacity="0.5"/>
+              <!-- Value labels -->
+              <text x="60"  y="96"  font-size="9" font-weight="600" fill="#374151" text-anchor="middle">5.0</text>
+              <text x="110" y="74"  font-size="9" font-weight="600" fill="#374151" text-anchor="middle">6.9</text>
+              <text x="160" y="66"  font-size="9" font-weight="600" fill="#374151" text-anchor="middle">7.6</text>
+              <text x="210" y="51"  font-size="9" font-weight="600" fill="#374151" text-anchor="middle">7.9</text>
+              <text x="255" y="57"  font-size="9" font-weight="600" fill="#374151" text-anchor="middle">4.8</text>
+              <!-- X labels -->
+              <text x="60"  y="130" font-size="9" fill="#9CA3AF" text-anchor="middle">S1</text>
+              <text x="110" y="130" font-size="9" fill="#9CA3AF" text-anchor="middle">S2</text>
+              <text x="160" y="130" font-size="9" fill="#9CA3AF" text-anchor="middle">S3</text>
+              <text x="210" y="130" font-size="9" font-weight="700" fill="#0F6E56" text-anchor="middle">S4</text>
+              <text x="260" y="130" font-size="9" font-weight="700" fill="#111827" text-anchor="middle">Hoje</text>
+              <text x="310" y="130" font-size="9" fill="#9CA3AF" text-anchor="middle">S5</text>
+              <!-- Today vertical guide -->
+              <line x1="260" y1="62" x2="260" y2="120" stroke="#111827" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.3"/>
+            </svg>
+          </div>
+
+          <div class="graph-legend">
+            <div class="legend-item">
+              <div class="legend-dot filled"></div>
+              <span>Nível pós-injeção</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot hollow"></div>
+              <span>Hoje (4.8 mg)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot dashed"></div>
+              <span>Projetado</span>
+            </div>
+          </div>
+
+          <div class="graph-footer">
+            <span>t½ ≈ 5 dias · Tirzepatida</span>
+            <span class="graph-footer-badge">↑ 58% do steady state</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════
+           SINGLE WELLNESS CARD
+      ══════════════════════════════════ -->
+      <div class="card wellness-card">
+
+        <!-- Card header -->
+        <div class="wc-header">
+          <div class="wc-title-row">
+            <div class="wc-icon">📓</div>
+            <span class="wc-title">Meu Diário</span>
+          </div>
+          <svg class="wc-arrow" width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M5.5 3l4 4.5-4 4.5" stroke="#9CA3AF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- ── Row: Diário ── -->
+        <div class="wc-section">
+          <div class="wc-section-label">
+            <strong>Bem-estar</strong>
+            <span>· Como te sentes hoje?</span>
+          </div>
+          <div class="mood-row" data-group="diary">
+
+            <div class="mood-item" data-mood="excelente" onclick="selectMood(this)">
+              <div class="mood-face">
+                <svg viewBox="0 0 40 40" fill="none">
+                  <circle cx="20" cy="20" r="18" fill="#FEF3C7"/>
+                  <path d="M13 15.5 Q14 13 15 15.5" stroke="#D97706" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M25 15.5 Q26 13 27 15.5" stroke="#D97706" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M12 22 Q20 30.5 28 22" stroke="#D97706" stroke-width="2.2" stroke-linecap="round"/>
+                  <circle cx="11" cy="24" r="3" fill="#FBBF24" opacity="0.35"/>
+                  <circle cx="29" cy="24" r="3" fill="#FBBF24" opacity="0.35"/>
+                </svg>
+              </div>
+              <span class="mood-label">Excelente</span>
+            </div>
+
+            <div class="mood-item selected" data-mood="estavel" onclick="selectMood(this)">
+              <div class="mood-face">
+                <svg viewBox="0 0 40 40" fill="none">
+                  <circle cx="20" cy="20" r="18" fill="#D1FAE5"/>
+                  <ellipse cx="14" cy="16.5" rx="2.8" ry="3.2" fill="#065F46" opacity="0.85"/>
+                  <ellipse cx="26" cy="16.5" rx="2.8" ry="3.2" fill="#065F46" opacity="0.85"/>
+                  <circle cx="13" cy="15.2" r="1" fill="white" opacity="0.7"/>
+                  <circle cx="25" cy="15.2" r="1" fill="white" opacity="0.7"/>
+                  <path d="M14 24.5 Q20 28.5 26 24.5" stroke="#065F46" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="mood-label">Estável</span>
+            </div>
+
+            <div class="mood-item" data-mood="cansado" onclick="selectMood(this)">
+              <div class="mood-face">
+                <svg viewBox="0 0 40 40" fill="none">
+                  <circle cx="20" cy="20" r="18" fill="#EDE9FE"/>
+                  <ellipse cx="14" cy="17" rx="3" ry="3.5" fill="#6D28D9" opacity="0.55"/>
+                  <rect x="11" y="13.5" width="6" height="3" rx="1.5" fill="#EDE9FE"/>
+                  <ellipse cx="26" cy="17" rx="3" ry="3.5" fill="#6D28D9" opacity="0.55"/>
+                  <rect x="23" y="13.5" width="6" height="3" rx="1.5" fill="#EDE9FE"/>
+                  <path d="M15 25.5 Q20 24 25 25.5" stroke="#6D28D9" stroke-width="1.8" stroke-linecap="round"/>
+                  <text x="27.5" y="13" font-size="6.5" fill="#6D28D9" font-family="Inter" font-weight="700" opacity="0.65">z</text>
+                  <text x="30" y="10" font-size="5" fill="#6D28D9" font-family="Inter" font-weight="700" opacity="0.45">z</text>
+                </svg>
+              </div>
+              <span class="mood-label">Cansado</span>
+            </div>
+
+            <div class="mood-item" data-mood="ansioso" onclick="selectMood(this)">
+              <div class="mood-face">
+                <svg viewBox="0 0 40 40" fill="none">
+                  <circle cx="20" cy="20" r="18" fill="#FFEDD5"/>
+                  <circle cx="14" cy="16.5" r="3.8" fill="#C2410C" opacity="0.75"/>
+                  <circle cx="26" cy="16.5" r="3.8" fill="#C2410C" opacity="0.75"/>
+                  <circle cx="12.8" cy="15.2" r="1.2" fill="white" opacity="0.7"/>
+                  <circle cx="24.8" cy="15.2" r="1.2" fill="white" opacity="0.7"/>
+                  <path d="M13 25.5 Q15.8 22.5 18 25.5 Q20.2 28.5 22.5 25.5 Q25 22.5 27 25.5"
+                        stroke="#C2410C" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M29 9.5 Q30.5 12 29 14 Q27.5 12 29 9.5Z" fill="#93C5FD" opacity="0.7"/>
+                </svg>
+              </div>
+              <span class="mood-label">Ansioso</span>
+            </div>
+
+            <div class="mood-item" data-mood="enjoado" onclick="selectMood(this)">
+              <div class="mood-face">
+                <svg viewBox="0 0 40 40" fill="none">
+                  <circle cx="20" cy="20" r="18" fill="#FCE7F3"/>
+                  <path d="M11.5 12.5 Q14 14.5 16.5 12.5" stroke="#9D174D" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M23.5 12.5 Q26 14.5 28.5 12.5" stroke="#9D174D" stroke-width="1.8" stroke-linecap="round"/>
+                  <ellipse cx="14" cy="17.5" rx="2.8" ry="2.6" fill="#9D174D" opacity="0.7"/>
+                  <ellipse cx="26" cy="17.5" rx="2.8" ry="2.6" fill="#9D174D" opacity="0.7"/>
+                  <path d="M14 26.5 Q20 22.5 26 26.5" stroke="#9D174D" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="mood-label">Enjoado</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="wc-divider"></div>
+
+        <!-- ── Row: Meu Doto ── -->
+        <div class="wc-section">
+          <div class="wc-section-label">
+            <strong>Meu Doto</strong>
+            <span>· Como te sentes ânimo?</span>
+          </div>
+          <div class="mood-row" data-group="doctor">
+
+            <div class="mood-item" data-mood="excelente" onclick="selectMood(this)">
+              <div class="mood-face">
+                <svg viewBox="0 0 40 40" fill="none">
+                  <circle cx="20" cy="20" r="18" fill="#FEF3C7"/>
+                  <path d="M13 15.5 Q14 13 15 15.5" stroke="#D97706" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M25 15.5 Q26 13 27 15.5" stroke="#D97706" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M12 22 Q20 30.5 28 22" stroke="#D97706" stroke-width="2.2" stroke-linecap="round"/>
+                  <circle cx="11" cy="24" r="3" fill="#FBBF24" opacity="0.35"/>
+                  <circle cx="29" cy="24" r="3" fill="#FBBF24" opacity="0.35"/>
+                </svg>
+              </div>
+              <span class="mood-label">Excelente</span>
+            </div>
+
+            <div class="mood-item selected" data-mood="estavel" onclick="selectMood(this)">
+              <div class="mood-face">
+                <svg viewBox="0 0 40 40" fill="none">
+                  <circle cx="20" cy="20" r="18" fill="#D1FAE5"/>
+                  <ellipse cx="14" cy="16.5" rx="2.8" ry="3.2" fill="#065F46" opacity="0.85"/>
+                  <ellipse cx="26" cy="16.5" rx="2.8" ry="3.2" fill="#065F46" opacity="0.85"/>
+                  <circle cx="13" cy="15.2" r="1" fill="white" opacity="0.7"/>
+                  <circle cx="25" cy="15.2" r="1" fill="white" opacity="0.7"/>
+                  <path d="M14 24.5 Q20 28.5 26 24.5" stroke="#065F46" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="mood-label">Estável</span>
+            </div>
+
+            <div class="mood-item" data-mood="cansado" onclick="selectMood(this)">
+              <div class="mood-face">
+                <svg viewBox="0 0 40 40" fill="none">
+                  <circle cx="20" cy="20" r="18" fill="#EDE9FE"/>
+                  <ellipse cx="14" cy="17" rx="3" ry="3.5" fill="#6D28D9" opacity="0.55"/>
+                  <rect x="11" y="13.5" width="6" height="3" rx="1.5" fill="#EDE9FE"/>
+                  <ellipse cx="26" cy="17" rx="3" ry="3.5" fill="#6D28D9" opacity="0.55"/>
+                  <rect x="23" y="13.5" width="6" height="3" rx="1.5" fill="#EDE9FE"/>
+                  <path d="M15 25.5 Q20 24 25 25.5" stroke="#6D28D9" stroke-width="1.8" stroke-linecap="round"/>
+                  <text x="27.5" y="13" font-size="6.5" fill="#6D28D9" font-family="Inter" font-weight="700" opacity="0.65">z</text>
+                </svg>
+              </div>
+              <span class="mood-label">Cansado</span>
+            </div>
+
+            <div class="mood-item" data-mood="ansioso" onclick="selectMood(this)">
+              <div class="mood-face">
+                <svg viewBox="0 0 40 40" fill="none">
+                  <circle cx="20" cy="20" r="18" fill="#FFEDD5"/>
+                  <circle cx="14" cy="16.5" r="3.8" fill="#C2410C" opacity="0.75"/>
+                  <circle cx="26" cy="16.5" r="3.8" fill="#C2410C" opacity="0.75"/>
+                  <circle cx="12.8" cy="15.2" r="1.2" fill="white" opacity="0.7"/>
+                  <circle cx="24.8" cy="15.2" r="1.2" fill="white" opacity="0.7"/>
+                  <path d="M13 25.5 Q15.8 22.5 18 25.5 Q20.2 28.5 22.5 25.5 Q25 22.5 27 25.5"
+                        stroke="#C2410C" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M29 9.5 Q30.5 12 29 14 Q27.5 12 29 9.5Z" fill="#93C5FD" opacity="0.7"/>
+                </svg>
+              </div>
+              <span class="mood-label">Ansioso</span>
+            </div>
+
+            <div class="mood-item" data-mood="enjoado" onclick="selectMood(this)">
+              <div class="mood-face">
+                <svg viewBox="0 0 40 40" fill="none">
+                  <circle cx="20" cy="20" r="18" fill="#FCE7F3"/>
+                  <path d="M11.5 12.5 Q14 14.5 16.5 12.5" stroke="#9D174D" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M23.5 12.5 Q26 14.5 28.5 12.5" stroke="#9D174D" stroke-width="1.8" stroke-linecap="round"/>
+                  <ellipse cx="14" cy="17.5" rx="2.8" ry="2.6" fill="#9D174D" opacity="0.7"/>
+                  <ellipse cx="26" cy="17.5" rx="2.8" ry="2.6" fill="#9D174D" opacity="0.7"/>
+                  <path d="M14 26.5 Q20 22.5 26 26.5" stroke="#9D174D" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="mood-label">Enjoado</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Note input -->
+        <div class="wc-note">
+          <span class="wc-note-text">Adicionar nota rápida...</span>
+          <div class="wc-note-btn">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+              <path d="M6.5 11V2M6.5 2L2.5 6M6.5 2L10.5 6"
+                    stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+
+      </div><!-- /wellness-card -->
+
+      <!-- Register injection -->
+      <div class="inject-btn">+ Registar injeção</div>
+
+    </div><!-- /cards -->
+
+    <!-- Tab bar -->
+    <div class="tabbar">
+      <div class="tab-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2"/><path d="M3 8h2a2 2 0 012 2v6a2 2 0 01-2 2H3"/>
+          <rect x="7" y="4" width="10" height="16" rx="2"/>
+          <line x1="12" y1="8" x2="12" y2="16"/><line x1="9" y1="11" x2="15" y2="11"/>
+        </svg>
+        Doses
+      </div>
+      <div class="tab-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L8 6H3l3.5 3.5L5 14l7-3 7 3-1.5-4.5L21 6h-5z"/>
+        </svg>
+        Peso
+      </div>
+      <div class="tab-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/>
+        </svg>
+        Mais
+      </div>
+    </div>
+
+  </div><!-- /screen -->
+</div><!-- /phone -->
+
+<script>
+  function selectMood(item) {
+    const group = item.closest('[data-group]');
+    group.querySelectorAll('.mood-item').forEach(el => el.classList.remove('selected', 'pop'));
+    item.classList.add('selected');
+    void item.querySelector('.mood-face').offsetWidth;
+    item.classList.add('pop');
+    item.addEventListener('animationend', () => item.classList.remove('pop'), { once: true });
+  }
+</script>
+</body>
+</html>

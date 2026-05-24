@@ -1,21 +1,18 @@
-// Paleta Steady — tons teal (saúde/calma) inspirados na identidade clínica moderna.
 export const Colors = {
-  primary: '#0F6E56',      // teal escuro — cor de marca
-  primaryLight: '#1D9E75',
-  primarySoft: '#E1F5EE',  // fundo suave
-  accent: '#185FA5',       // azul — dados/gráficos
-  bg: '#FFFFFF',
-  bgSecondary: '#F4F6F5',
-  text: '#1A1A1A',
-  textSecondary: '#6B6B6B',
-  textTertiary: '#9A9A9A',
-  border: '#E4E7E6',
-  danger: '#A32D2D',
-  warning: '#854F0B',
-  success: '#0F6E56',
-  // série de gráficos
+  primary:       '#0F6E56',
+  primaryLight:  '#1D9E75',
+  primarySoft:   '#E6F4F0',
+  bg:            '#FFFFFF',
+  bgSecondary:   '#F5F5F7',
+  text:          '#111827',
+  textSecondary: '#6B7280',
+  textTertiary:  '#9CA3AF',
+  border:        '#E5E7EB',
+  danger:        '#DC2626',
+  warning:       '#D97706',
+  success:       '#16A34A',
   chartResidual: '#85B7EB',
-  chartFresh: '#185FA5',
+  chartFresh:    '#0F6E56',
 };
 
 export const Spacing = {
@@ -27,7 +24,32 @@ export const Spacing = {
 };
 
 export const Radius = {
-  md: 8,
-  lg: 12,
-  xl: 16,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 20,
+};
+
+export const Shadow = {
+  sm: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.10,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+  primary: {
+    shadowColor: '#0F6E56',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.28,
+    shadowRadius: 14,
+    elevation: 6,
+  },
 };
