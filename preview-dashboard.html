@@ -644,6 +644,72 @@
       letter-spacing: 0.4px;
     }
 
+    /* ── Food card (Home screen) ────────────────────── */
+    .food-card-home {
+      background: var(--bg);
+      border-radius: 16px;
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 10px;
+    }
+    .food-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+    }
+    .food-card-header-left { flex: 1; margin-right: 12px; }
+    .food-card-title { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+    .food-card-sub   { font-size: 12px; color: var(--text2); margin-top: 3px; }
+    .food-ring-wrap  {
+      width: 44px; height: 44px;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .food-ring-pct {
+      position: absolute;
+      font-size: 9px; font-weight: 700; color: var(--primary);
+    }
+    .food-card-divider { height: 0.5px; background: var(--border); }
+    .food-macro-section {
+      padding: 12px 16px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .food-macro-row { display: flex; align-items: center; gap: 8px; }
+    .food-macro-label { font-size: 12px; font-weight: 500; color: var(--text2); width: 84px; flex-shrink: 0; }
+    .food-macro-track { flex: 1; height: 5px; background: #F3F4F6; border-radius: 3px; overflow: hidden; }
+    .food-macro-fill  { height: 5px; border-radius: 3px; }
+    .food-macro-val   { font-size: 14px; font-weight: 600; color: var(--text); width: 36px; text-align: right; flex-shrink: 0; }
+    .food-actions-home {
+      display: flex; gap: 8px; padding: 12px 16px;
+    }
+    .food-btn-manual-home {
+      flex: 1; background: var(--bg2); border: 0.5px solid var(--border);
+      border-radius: 12px; padding: 13px 0;
+      font-size: 14px; font-weight: 600; color: var(--text);
+      cursor: pointer; font-family: 'Inter', sans-serif;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .food-btn-ai-home {
+      flex: 1; background: var(--primary); border: none;
+      border-radius: 12px; padding: 13px 0;
+      font-size: 14px; font-weight: 600; color: #fff;
+      cursor: pointer; font-family: 'Inter', sans-serif;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      box-shadow: 0 4px 14px rgba(15,110,86,0.35);
+    }
+    .badge-free {
+      background: #E5E7EB; border-radius: 4px;
+      padding: 1px 5px; font-size: 9px; font-weight: 700; color: #6B7280; letter-spacing: 0.3px;
+    }
+    .badge-pro {
+      background: rgba(255,255,255,0.22); border-radius: 4px;
+      padding: 1px 5px; font-size: 9px; font-weight: 700; color: #fff; letter-spacing: 0.3px;
+    }
+    .meal-desc-ai { font-size: 12px; color: var(--text2); margin-top: 1px; }
+    .ai-dot { color: var(--primary); font-weight: 600; }
+
     /* Meal rows */
     .meal-row {
       display: flex;
@@ -973,24 +1039,69 @@
         </div>
       </div>
 
-      <!-- History -->
-      <div class="card">
-        <div class="hist-title">Referência injeções</div>
-        <div class="hist-row">
-          <div class="hist-left"><div class="hist-dot"></div><span class="hist-dose">5 mg · Abdómen</span></div>
-          <span class="hist-date">24 mai 26</span>
+      <!-- Food Tracking Card -->
+      <div class="food-card-home">
+        <div class="food-card-header">
+          <div class="food-card-header-left">
+            <div class="food-card-title">Refeições de hoje</div>
+            <div class="food-card-sub">24 mai · 1 240 kcal registadas</div>
+          </div>
+          <div class="food-ring-wrap">
+            <svg width="44" height="44" viewBox="0 0 36 36" style="position:absolute;top:0;left:0">
+              <circle cx="18" cy="18" r="15" fill="none" stroke="#E5E7EB" stroke-width="3"/>
+              <circle cx="18" cy="18" r="15" fill="none" stroke="#0F6E56" stroke-width="3"
+                stroke-dasharray="62 94" stroke-dashoffset="23" stroke-linecap="round"/>
+            </svg>
+            <span class="food-ring-pct">66%</span>
+          </div>
         </div>
-        <div class="hist-row">
-          <div class="hist-left"><div class="hist-dot old"></div><span class="hist-dose">5 mg · Abdómen</span></div>
-          <span class="hist-date">17 mai 26</span>
+        <div class="food-card-divider"></div>
+        <div class="food-macro-section">
+          <div class="food-macro-row">
+            <span class="food-macro-label">Proteína</span>
+            <div class="food-macro-track"><div class="food-macro-fill" style="width:72%;background:#0F6E56"></div></div>
+            <span class="food-macro-val">98 g</span>
+          </div>
+          <div class="food-macro-row">
+            <span class="food-macro-label">Carboidratos</span>
+            <div class="food-macro-track"><div class="food-macro-fill" style="width:58%;background:#85B7EB"></div></div>
+            <span class="food-macro-val">180 g</span>
+          </div>
+          <div class="food-macro-row">
+            <span class="food-macro-label">Gordura</span>
+            <div class="food-macro-track"><div class="food-macro-fill" style="width:44%;background:#D97706"></div></div>
+            <span class="food-macro-val">62 g</span>
+          </div>
         </div>
-        <div class="hist-row">
-          <div class="hist-left"><div class="hist-dot old"></div><span class="hist-dose">5 mg · Abdómen</span></div>
-          <span class="hist-date">10 mai 26</span>
+        <div class="food-card-divider"></div>
+        <div class="meal-row">
+          <span class="meal-icon">🥣</span>
+          <div class="meal-info">
+            <div class="meal-name">Pequeno-almoço</div>
+            <div class="meal-desc">Aveia + fruta · manual</div>
+          </div>
+          <span class="meal-kcal">420 kcal</span>
         </div>
-        <div class="hist-row">
-          <div class="hist-left"><div class="hist-dot old"></div><span class="hist-dose">5 mg · Coxa</span></div>
-          <span class="hist-date">3 mai 26</span>
+        <div class="meal-row">
+          <span class="meal-icon">🍱</span>
+          <div class="meal-info">
+            <div class="meal-name">Almoço</div>
+            <div class="meal-desc">Frango + arroz · manual</div>
+          </div>
+          <span class="meal-kcal">580 kcal</span>
+        </div>
+        <div class="meal-row">
+          <span class="meal-icon">📷</span>
+          <div class="meal-info">
+            <div class="meal-name">Lanche</div>
+            <div class="meal-desc-ai"><span class="ai-dot">♦ IA identificou · </span>iogurte grego</div>
+          </div>
+          <span class="meal-kcal">240 kcal</span>
+        </div>
+        <div class="food-card-divider"></div>
+        <div class="food-actions-home">
+          <button class="food-btn-manual-home">+ Manual <span class="badge-free">FREE</span></button>
+          <button class="food-btn-ai-home">📷 Foto IA <span class="badge-pro">PRO</span></button>
         </div>
       </div>
 
@@ -1083,65 +1194,64 @@
       <div class="food-h1">Comida</div>
       <div class="food-date">Hoje · sábado, 24 mai</div>
 
-      <!-- Macros -->
-      <div class="macro-card">
-        <div class="macro-row">
-          <div>
-            <div class="macro-cal-val">1 240</div>
-            <div class="macro-cal-label">kcal hoje</div>
+      <!-- Card unificado (idêntico ao food.tsx) -->
+      <div class="food-card-home">
+        <div class="food-card-header">
+          <div class="food-card-header-left">
+            <div class="food-card-title">Refeições de hoje</div>
+            <div class="food-card-sub">24 mai · 1 310 kcal registadas</div>
           </div>
-          <div class="macro-bars">
-            <div class="macro-bar-row">
-              <span class="macro-name">Proteína</span>
-              <div class="macro-track"><div class="macro-fill prot" style="width:68%"></div></div>
-              <span class="macro-val">82g</span>
-            </div>
-            <div class="macro-bar-row">
-              <span class="macro-name">Carbs</span>
-              <div class="macro-track"><div class="macro-fill carbs" style="width:54%"></div></div>
-              <span class="macro-val">135g</span>
-            </div>
-            <div class="macro-bar-row">
-              <span class="macro-name">Gordura</span>
-              <div class="macro-track"><div class="macro-fill fat" style="width:38%"></div></div>
-              <span class="macro-val">42g</span>
-            </div>
+          <div class="food-ring-wrap">
+            <svg width="44" height="44" viewBox="0 0 36 36" style="position:absolute;top:0;left:0">
+              <circle cx="18" cy="18" r="15" fill="none" stroke="#E5E7EB" stroke-width="3"/>
+              <circle cx="18" cy="18" r="15" fill="none" stroke="#0F6E56" stroke-width="3"
+                stroke-dasharray="66 94" stroke-dashoffset="23" stroke-linecap="round"/>
+            </svg>
+            <span class="food-ring-pct">70%</span>
           </div>
         </div>
-      </div>
-
-      <!-- Action buttons -->
-      <div class="food-actions">
-        <button class="food-btn-manual">+ Manual</button>
-        <button class="food-btn-ai">📷 Foto IA <span class="pro-badge">PRO</span></button>
-      </div>
-
-      <!-- Refeições -->
-      <div class="card">
-        <div class="hist-title">Refeições de hoje</div>
+        <div class="food-card-divider"></div>
+        <div class="food-macro-section">
+          <div class="food-macro-row">
+            <span class="food-macro-label">Proteína</span>
+            <div class="food-macro-track"><div class="food-macro-fill" style="width:65%;background:#0F6E56"></div></div>
+            <span class="food-macro-val">98 g</span>
+          </div>
+          <div class="food-macro-row">
+            <span class="food-macro-label">Carboidratos</span>
+            <div class="food-macro-track"><div class="food-macro-fill" style="width:61%;background:#85B7EB"></div></div>
+            <span class="food-macro-val">162 g</span>
+          </div>
+          <div class="food-macro-row">
+            <span class="food-macro-label">Gordura</span>
+            <div class="food-macro-track"><div class="food-macro-fill" style="width:52%;background:#D97706"></div></div>
+            <span class="food-macro-val">35 g</span>
+          </div>
+        </div>
+        <div class="food-card-divider"></div>
         <div class="meal-row">
-          <span class="meal-icon">🌅</span>
+          <span class="meal-icon">🥣</span>
           <div class="meal-info">
             <div class="meal-name">Pequeno-almoço</div>
-            <div class="meal-desc">Aveia · iogurte · banana</div>
+            <div class="meal-desc">Aveia + fruta · manual</div>
           </div>
           <span class="meal-kcal">420 kcal</span>
         </div>
         <div class="meal-row">
-          <span class="meal-icon">☀️</span>
+          <span class="meal-icon">🍱</span>
           <div class="meal-info">
             <div class="meal-name">Almoço</div>
-            <div class="meal-desc">Frango · arroz · salada</div>
+            <div class="meal-desc">Frango + arroz · manual</div>
           </div>
-          <span class="meal-kcal">580 kcal</span>
+          <span class="meal-kcal">680 kcal</span>
         </div>
         <div class="meal-row">
-          <span class="meal-icon">🌆</span>
+          <span class="meal-icon">📷</span>
           <div class="meal-info">
             <div class="meal-name">Lanche</div>
-            <div class="meal-desc">Maçã · amêndoas</div>
+            <div class="meal-desc-ai"><span class="ai-dot">♦ IA identificou · </span>iogurte grego</div>
           </div>
-          <span class="meal-kcal">240 kcal</span>
+          <span class="meal-kcal">210 kcal</span>
         </div>
         <div class="meal-row">
           <span class="meal-icon">🌙</span>
@@ -1150,6 +1260,11 @@
             <div class="meal-desc" style="color:var(--text3)">Não registado</div>
           </div>
           <div class="meal-add">+</div>
+        </div>
+        <div class="food-card-divider"></div>
+        <div class="food-actions-home">
+          <button class="food-btn-manual-home">+ Manual <span class="badge-free">FREE</span></button>
+          <button class="food-btn-ai-home">📷 Foto IA <span class="badge-pro">PRO</span></button>
         </div>
       </div>
 
