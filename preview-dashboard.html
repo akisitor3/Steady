@@ -289,7 +289,7 @@
 
     /* Hero card */
     .hero {
-      background: linear-gradient(145deg, #1D9E75 0%, #0F6E56 55%, #0A5240 100%);
+      background: linear-gradient(to bottom right, #1D9E75 0%, #0A5240 100%);
       border-radius: 22px;
       padding: 22px 22px 18px;
       margin-bottom: 10px;
@@ -299,20 +299,22 @@
         0 10px 32px rgba(15,110,86,0.34),
         0 3px 8px rgba(15,110,86,0.20);
     }
+    /* orb maior: atrás da pill "Próx. dose" (top-right, recuado para não dominar) */
     .hero::before {
       content: '';
       position: absolute;
-      top: -50px; right: -50px;
-      width: 200px; height: 200px;
-      background: rgba(255,255,255,0.07);
+      top: -30px; right: -30px;
+      width: 160px; height: 160px;
+      background: radial-gradient(circle, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0) 65%);
       border-radius: 50%;
     }
+    /* orb menor: atrás de "Próxima: 28 Mai" (bottom-right) */
     .hero::after {
       content: '';
       position: absolute;
-      bottom: -70px; left: -24px;
-      width: 180px; height: 180px;
-      background: rgba(255,255,255,0.04);
+      bottom: -10px; right: -10px;
+      width: 110px; height: 110px;
+      background: radial-gradient(circle, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 65%);
       border-radius: 50%;
     }
     .hero-top {
@@ -347,12 +349,12 @@
     }
     /* PK pills (frosted glass) */
     .hero-pills {
-      background: rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.12);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border-radius: 11px;
-      border: 0.5px solid rgba(255,255,255,0.22);
-      padding: 6px 8px;
+      border: none;
+      padding: 4px 8px;
       display: flex;
       gap: 6px;
       align-items: center;
@@ -410,14 +412,7 @@
       align-items: center;
       gap: 5px;
     }
-    .hero-foot-r::before {
-      content: '';
-      display: inline-block;
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.65);
-    }
+    /* bullet removido — "Próxima: 28 Mai" sem ponto a preceder */
 
     /* Chart card */
     .chart-card {
@@ -847,7 +842,7 @@
 
         <!-- Mini PK SVG (JS-generated) -->
         <div class="hero-chart">
-          <svg id="hero-svg" width="100%" viewBox="0 0 310 62" style="display:block;"></svg>
+          <svg id="hero-svg" width="100%" viewBox="0 -6 310 68" style="display:block;"></svg>
         </div>
 
         <div class="hero-footer">
@@ -879,92 +874,97 @@
           </div>
         </div>
 
-        <svg width="100%" viewBox="0 0 340 185" fill="none">
+        <svg width="100%" viewBox="0 0 316 158" fill="none">
           <defs>
-            <linearGradient id="ag2" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%"   stop-color="#0F6E56" stop-opacity="0.14"/>
               <stop offset="100%" stop-color="#0F6E56" stop-opacity="0.01"/>
             </linearGradient>
-            <linearGradient id="ag2proj" x1="0" y1="0" x2="0" y2="1">
+            <linearGradient id="areaGradProj" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%"   stop-color="#0F6E56" stop-opacity="0.06"/>
               <stop offset="100%" stop-color="#0F6E56" stop-opacity="0.01"/>
             </linearGradient>
           </defs>
 
-          <!-- Y labels (de 2 em 2, 0→12) -->
-          <text x="22" y="23"  font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="end">12</text>
-          <text x="22" y="45"  font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="end">10</text>
-          <text x="22" y="67"  font-size="9" fill="#0F6E56" font-family="Inter" text-anchor="end" font-weight="700">8</text>
-          <text x="22" y="89"  font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="end">6</text>
-          <text x="22" y="111" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="end">4</text>
-          <text x="22" y="133" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="end">2</text>
-          <text x="22" y="155" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="end">0</text>
+          <!-- Y axis -->
+          <line x1="36" y1="10" x2="36" y2="128" stroke="#E5E7EB" stroke-width="0.5"/>
 
-          <!-- Grid lines -->
-          <line x1="26" y1="20"  x2="330" y2="20"  stroke="#F3F4F6" stroke-width="0.5"/>
-          <line x1="26" y1="42"  x2="330" y2="42"  stroke="#F3F4F6" stroke-width="0.5"/>
-          <line x1="26" y1="86"  x2="330" y2="86"  stroke="#F3F4F6" stroke-width="0.5"/>
-          <line x1="26" y1="108" x2="330" y2="108" stroke="#F3F4F6" stroke-width="0.5"/>
-          <line x1="26" y1="130" x2="330" y2="130" stroke="#F3F4F6" stroke-width="0.5"/>
-          <line x1="26" y1="155" x2="330" y2="155" stroke="#F3F4F6" stroke-width="1"/>
+          <!-- Grid lines + Y labels (escala: y = 120 − mg × 8.5) -->
+          <line x1="36" y1="18"  x2="306" y2="18"  stroke="#E5E7EB" stroke-width="0.5"/>
+          <text x="28" y="21"  text-anchor="end" font-size="8" fill="#9CA3AF" font-family="Inter,sans-serif">12</text>
+          <line x1="36" y1="35"  x2="306" y2="35"  stroke="#E5E7EB" stroke-width="0.5"/>
+          <text x="28" y="38"  text-anchor="end" font-size="8" fill="#9CA3AF" font-family="Inter,sans-serif">10</text>
+          <!-- 8 mg — steady state -->
+          <line x1="36" y1="52"  x2="306" y2="52"  stroke="#0F6E56" stroke-width="1" stroke-dasharray="4 3" opacity="0.4"/>
+          <text x="28" y="55"  text-anchor="end" font-size="8" fill="#0F6E56" font-family="Inter,sans-serif" font-weight="600">8</text>
+          <text x="296" y="49" text-anchor="end" font-size="7.5" fill="#0F6E56" font-family="Inter,sans-serif" font-weight="600" opacity="0.7">SS</text>
+          <line x1="36" y1="69"  x2="306" y2="69"  stroke="#E5E7EB" stroke-width="0.5"/>
+          <text x="28" y="72"  text-anchor="end" font-size="8" fill="#9CA3AF" font-family="Inter,sans-serif">6</text>
+          <line x1="36" y1="86"  x2="306" y2="86"  stroke="#E5E7EB" stroke-width="0.5"/>
+          <text x="28" y="89"  text-anchor="end" font-size="8" fill="#9CA3AF" font-family="Inter,sans-serif">4</text>
+          <line x1="36" y1="103" x2="306" y2="103" stroke="#E5E7EB" stroke-width="0.5"/>
+          <text x="28" y="106" text-anchor="end" font-size="8" fill="#9CA3AF" font-family="Inter,sans-serif">2</text>
+          <line x1="36" y1="120" x2="306" y2="120" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="28" y="123" text-anchor="end" font-size="8" fill="#9CA3AF" font-family="Inter,sans-serif">0</text>
 
-          <!-- Steady state line at 8mg (y=64) — verde tracejado + label SS -->
-          <line x1="26" y1="64" x2="316" y2="64" stroke="#0F6E56" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.55"/>
-          <text x="322" y="67" font-size="8" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="700">SS</text>
+          <!-- Y axis unit label -->
+          <text x="4" y="70" text-anchor="middle" font-size="7.5" fill="#9CA3AF" font-family="Inter,sans-serif" transform="rotate(-90,4,70)">mg</text>
 
-          <!-- Area fill solid (S1 → hoje) -->
-          <path d="M 45,155 L 45,99 C 58,112 76,130 93,134 L 98,77 C 112,90 132,118 153,125 L 158,70 C 172,83 193,114 213,121 L 218,66 C 231,79 253,102 268,101 L 268,155 Z"
-            fill="url(#ag2)"/>
-          <!-- Area fill projected (hoje → S5) -->
-          <path d="M 268,155 L 268,101 C 282,111 302,120 308,121 L 308,64 L 322,69 L 322,155 Z"
-            fill="url(#ag2proj)"/>
+          <!-- Area fill S1→hoje (sólido) -->
+          <path d="M 60,77.5 C 75,85 95,98 116,104 L 118,61.4 C 133,68 153,83 174,98 L 176,55.4 C 191,62 211,78 232,95.4 L 234,52.9 C 244,60 255,71 263,78.9 L 263,120 L 60,120 Z" fill="url(#areaGrad)"/>
+          <!-- Area fill hoje→S5 (projetado) -->
+          <path d="M 263,78.9 C 272,88 280,93 290,94.5 L 292,52 C 296,56 300,59 306,61 L 306,120 L 263,120 Z" fill="url(#areaGradProj)"/>
 
-          <!-- Curva principal S1→hoje (sólido) -->
-          <path d="M 45,99 C 58,112 76,130 93,134 L 98,77 C 112,90 132,118 153,125 L 158,70 C 172,83 193,114 213,121 L 218,66 C 231,79 253,102 268,101"
-            stroke="#0F6E56" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Curva S1→S4→Hoje (sólido) -->
+          <path d="M 60,77.5 C 75,85 95,98 116,104 L 118,61.4 C 133,68 153,83 174,98 L 176,55.4 C 191,62 211,78 232,95.4 L 234,52.9 C 244,60 255,71 263,78.9"
+                fill="none" stroke="#0F6E56" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Curva Hoje→S5 (tracejado projetado) -->
+          <path d="M 263,78.9 C 272,88 280,93 290,94.5 L 292,52 C 296,56 300,59 306,61"
+                fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.45" stroke-linecap="round"/>
 
-          <!-- Curva projetada hoje→S5 (tracejado mais fraco) -->
-          <path d="M 268,101 C 282,111 302,120 308,121 L 308,64 C 314,67 318,68 322,69"
-            stroke="#0F6E56" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="4 3" opacity="0.40"/>
+          <!-- Linha vertical Hoje -->
+          <line x1="263" y1="52" x2="263" y2="120" stroke="#0F6E56" stroke-width="1" stroke-dasharray="3 2" opacity="0.35"/>
 
-          <!-- Linha vertical "Hoje" tracejada -->
-          <line x1="268" y1="64" x2="268" y2="155" stroke="#0F6E56" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.30"/>
+          <!-- Picos S1–S4 -->
+          <circle cx="60"  cy="77.5" r="3.5" fill="#0F6E56" stroke="white" stroke-width="1.5"/>
+          <text x="60"  y="72"  text-anchor="middle" font-size="8.5" fill="#0F6E56" font-family="Inter,sans-serif" font-weight="700">5.0</text>
+          <circle cx="118" cy="61.4" r="3.5" fill="#0F6E56" stroke="white" stroke-width="1.5"/>
+          <text x="118" y="56"  text-anchor="middle" font-size="8.5" fill="#0F6E56" font-family="Inter,sans-serif" font-weight="700">6.9</text>
+          <circle cx="176" cy="55.4" r="3.5" fill="#0F6E56" stroke="white" stroke-width="1.5"/>
+          <text x="176" y="50"  text-anchor="middle" font-size="8.5" fill="#0F6E56" font-family="Inter,sans-serif" font-weight="700">7.6</text>
+          <circle cx="234" cy="52.9" r="5"   fill="#0F6E56" stroke="white" stroke-width="2"/>
+          <text x="234" y="46"  text-anchor="middle" font-size="9"   fill="#0F6E56" font-family="Inter,sans-serif" font-weight="700">7.9</text>
 
-          <!-- Dots nos picos (S1–S4) -->
-          <circle cx="45"  cy="99"  r="3.5" fill="#0F6E56" stroke="white" stroke-width="1.5"/>
-          <circle cx="98"  cy="77"  r="3.5" fill="#0F6E56" stroke="white" stroke-width="1.5"/>
-          <circle cx="158" cy="70"  r="3.5" fill="#0F6E56" stroke="white" stroke-width="1.5"/>
-          <circle cx="218" cy="66"  r="4"   fill="#0F6E56" stroke="white" stroke-width="2"/>
+          <!-- Hoje dot -->
+          <circle cx="263" cy="78.9" r="4" fill="white" stroke="#0F6E56" stroke-width="2"/>
+          <text x="263" y="73" text-anchor="middle" font-size="8" fill="#0F6E56" font-family="Inter,sans-serif" font-weight="600">4.8</text>
 
-          <!-- Valores nos picos -->
-          <text x="45"  y="93"  font-size="8.5" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="700">5.0</text>
-          <text x="98"  y="71"  font-size="8.5" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="700">6.9</text>
-          <text x="158" y="64"  font-size="8.5" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="700">7.6</text>
-          <text x="218" y="59"  font-size="8.5" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="700">7.9</text>
-
-          <!-- Hoje: dot branco + valor 4.8 mg -->
-          <circle cx="268" cy="101" r="5" fill="#fff" stroke="#0F6E56" stroke-width="2"/>
-          <text x="268" y="95" font-size="8" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="600">4.8 mg</text>
-
-          <!-- S5 projetado: dot vazio -->
-          <circle cx="308" cy="64" r="3.5" fill="none" stroke="#0F6E56" stroke-width="1.5" opacity="0.45"/>
-          <text x="308" y="58" font-size="8" fill="#9CA3AF" font-family="Inter" text-anchor="middle" font-weight="600">8.0</text>
+          <!-- S5 projetado -->
+          <circle cx="292" cy="52" r="3.5" fill="white" stroke="#0F6E56" stroke-width="1.5" opacity="0.5"/>
+          <text x="292" y="47" text-anchor="middle" font-size="8.5" fill="#9CA3AF" font-family="Inter,sans-serif" font-weight="600">8.0</text>
 
           <!-- X labels -->
-          <text x="45"  y="169" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="middle">S1</text>
-          <text x="98"  y="169" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="middle">S2</text>
-          <text x="158" y="169" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="middle">S3</text>
-          <text x="218" y="169" font-size="9" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="700">S4</text>
-          <text x="268" y="169" font-size="9" fill="#0F6E56" font-family="Inter" text-anchor="middle" font-weight="600">Hoje</text>
-          <text x="308" y="169" font-size="9" fill="#9CA3AF" font-family="Inter" text-anchor="middle">S5</text>
+          <text x="60"  y="134" text-anchor="middle" font-size="9" fill="#6B7280" font-family="Inter,sans-serif" font-weight="500">S1</text>
+          <text x="118" y="134" text-anchor="middle" font-size="9" fill="#6B7280" font-family="Inter,sans-serif" font-weight="500">S2</text>
+          <text x="176" y="134" text-anchor="middle" font-size="9" fill="#6B7280" font-family="Inter,sans-serif" font-weight="500">S3</text>
+          <text x="234" y="134" text-anchor="middle" font-size="9" fill="#0F6E56" font-family="Inter,sans-serif" font-weight="700">S4</text>
+          <text x="263" y="134" text-anchor="middle" font-size="8" fill="#0F6E56" font-family="Inter,sans-serif" font-weight="600">Hoje</text>
+          <text x="292" y="134" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="Inter,sans-serif">S5</text>
 
-          <!-- Legenda inline -->
-          <circle cx="36" cy="180" r="3" fill="#0F6E56"/>
-          <text x="42" y="183" font-size="8.5" fill="#6B7280" font-family="Inter">Nível pós-injeção</text>
-          <circle cx="138" cy="180" r="4" fill="white" stroke="#0F6E56" stroke-width="1.5"/>
-          <text x="145" y="183" font-size="8.5" fill="#6B7280" font-family="Inter">Hoje (4.8 mg)</text>
-          <line x1="226" y1="180" x2="239" y2="180" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="3 2" opacity="0.45"/>
-          <text x="243" y="183" font-size="8.5" fill="#9CA3AF" font-family="Inter">Projetado</text>
+          <!-- X ticks -->
+          <line x1="60"  y1="120" x2="60"  y2="124" stroke="#E5E7EB" stroke-width="1"/>
+          <line x1="118" y1="120" x2="118" y2="124" stroke="#E5E7EB" stroke-width="1"/>
+          <line x1="176" y1="120" x2="176" y2="124" stroke="#E5E7EB" stroke-width="1"/>
+          <line x1="234" y1="120" x2="234" y2="124" stroke="#0F6E56" stroke-width="1.5"/>
+          <line x1="292" y1="120" x2="292" y2="124" stroke="#E5E7EB" stroke-width="1" stroke-dasharray="2 1"/>
+
+          <!-- Legenda -->
+          <circle cx="42"  cy="147" r="3" fill="#0F6E56"/>
+          <text x="48"  y="150" font-size="8" fill="#6B7280" font-family="Inter,sans-serif">Nível pós-injeção</text>
+          <circle cx="140" cy="147" r="3" fill="white" stroke="#0F6E56" stroke-width="1.5"/>
+          <text x="147" y="150" font-size="8" fill="#6B7280" font-family="Inter,sans-serif">Hoje (4.8 mg)</text>
+          <line x1="225" y1="147" x2="237" y2="147" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="3 2" opacity="0.5"/>
+          <text x="240" y="150" font-size="8" fill="#9CA3AF" font-family="Inter,sans-serif">Projetado</text>
         </svg>
 
         <div class="chart-footer-strip">
@@ -1349,9 +1349,17 @@
     const xB = xS(tNow),  yB = yS(vHoje);
     const xC = xS(tSpan), yC = yS(vProxima);
 
+    /* 3 linhas de grelha: enquadram a curva real (75%, 50%, 25% de Q0) */
+    const gL1 = yS(Q0 * 0.75).toFixed(1);
+    const gL2 = yS(Q0 * 0.50).toFixed(1);
+    const gL3 = yS(Q0 * 0.25).toFixed(1);
+
     svg.innerHTML =
+      `<line x1="${PL}" y1="${gL1}" x2="${W - PR}" y2="${gL1}" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>` +
+      `<line x1="${PL}" y1="${gL2}" x2="${W - PR}" y2="${gL2}" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>` +
+      `<line x1="${PL}" y1="${gL3}" x2="${W - PR}" y2="${gL3}" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>` +
       `<path d="${decayPath}" fill="none" stroke="rgba(255,255,255,0.48)" stroke-width="1.8" stroke-dasharray="5 4" stroke-linecap="round"/>` +
-      `<line x1="${xC}" y1="${yC}" x2="${xC}" y2="${H - 4}" stroke="rgba(255,255,255,0.25)" stroke-width="0.8" stroke-dasharray="3 3"/>` +
+      `<line x1="${xC}" y1="${yC}" x2="${xC}" y2="${H - 4}" stroke="rgba(255,255,255,0.40)" stroke-width="1.2" stroke-dasharray="3 3"/>` +
       `<path d="${previewPath}" fill="none" stroke="rgba(255,255,255,0.40)" stroke-width="1.8" stroke-linecap="round"/>` +
       `<circle cx="${xA}" cy="${yA}" r="5" fill="#fff" opacity="0.90"/>` +
       (tNow > 0.3 ? `<circle cx="${xB}" cy="${yB}" r="3" fill="#fff" opacity="0.88"/>` : '') +
