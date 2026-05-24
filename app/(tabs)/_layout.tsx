@@ -43,6 +43,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="food"
+        options={{
+          title: 'Comida',
+          tabBarIcon: ({ color }) => <TabIcon emoji="🥗" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="more"
         options={{
           title: 'Mais',

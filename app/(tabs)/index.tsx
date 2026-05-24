@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Pressable, Modal, SafeAreaView,
 } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
 import { useApp } from '@/lib/store/useApp';
 import { MEDICATIONS } from '@/constants/medications';
 import { Colors, Spacing, Radius, Shadow } from '@/constants/theme';
@@ -130,24 +131,81 @@ export default function DosesScreen() {
 
         <BodyLevelChart data={weekly} />
 
-        {injections.length > 0 && (
-          <View style={[styles.historyCard, Shadow.sm]}>
-            <Text style={styles.histTitle}>Últimas injeções</Text>
-            {[...injections].reverse().slice(0, 5).map((inj, i) => (
-              <View key={inj.id} style={[styles.histRow, i === 0 && { borderTopWidth: 0 }]}>
-                <View style={styles.histLeft}>
-                  <View style={[styles.histDot, i > 0 && styles.histDotOld]} />
-                  <Text style={styles.histDose}>{inj.doseMg} mg</Text>
-                </View>
-                <Text style={styles.histDate}>
-                  {new Date(inj.date).toLocaleDateString('pt-PT', {
-                    day: 'numeric', month: 'short', year: '2-digit',
-                  })}
-                </Text>
-              </View>
-            ))}
+        {/* Food Tracking Card */}
+        <View style={[styles.foodCard, Shadow.sm]}>
+          <View style={styles.foodHeader}>
+            <View style={styles.foodHeaderLeft}>
+              <Text style={styles.foodTitle}>Refeições de hoje</Text>
+              <Text style={styles.foodSub}>
+                {new Date().toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' })} · 1 240 kcal registadas
+              </Text>
+            </View>
+            <View style={styles.foodRing}>
+              <Svg width={44} height={44} viewBox="0 0 36 36" style={{ position: 'absolute' }}>
+                <Circle cx={18} cy={18} r={15} fill="none" stroke={Colors.border} strokeWidth={3} />
+                <Circle cx={18} cy={18} r={15} fill="none" stroke={Colors.primary} strokeWidth={3}
+                  strokeDasharray="62 94" strokeDashoffset={23} strokeLinecap="round" />
+              </Svg>
+              <Text style={styles.foodRingPct}>66%</Text>
+            </View>
           </View>
-        )}
+
+          <View style={styles.foodDivider} />
+
+          <View style={styles.macroSection}>
+            <View style={styles.macroRow}>
+              <Text style={styles.macroLabel}>Proteína</Text>
+              <View style={styles.macroTrack}>
+                <View style={[styles.macroFill, { width: '72%', backgroundColor: Colors.primary }]} />
+              </View>
+              <Text style={styles.macroVal}>98 g</Text>
+            </View>
+            <View style={styles.macroRow}>
+              <Text style={styles.macroLabel}>Carboidratos</Text>
+              <View style={styles.macroTrack}>
+                <View style={[styles.macroFill, { width: '58%', backgroundColor: Colors.chartResidual }]} />
+              </View>
+              <Text style={styles.macroVal}>180 g</Text>
+            </View>
+            <View style={styles.macroRow}>
+              <Text style={styles.macroLabel}>Gordura</Text>
+              <View style={styles.macroTrack}>
+                <View style={[styles.macroFill, { width: '44%', backgroundColor: Colors.warning }]} />
+              </View>
+              <Text style={styles.macroVal}>62 g</Text>
+            </View>
+          </View>
+
+          <View style={styles.foodDivider} />
+
+          {[
+            { emoji: '🥣', name: 'Pequeno-almoço', desc: 'Aveia + fruta · manual', kcal: 420 },
+            { emoji: '🍱', name: 'Almoço',         desc: 'Frango + arroz · manual', kcal: 580 },
+            { emoji: '📷', name: 'Lanche',          desc: '♦ IA identificou · iogurte grego', kcal: 240, ai: true },
+          ].map((m) => (
+            <View key={m.name} style={styles.mealRow}>
+              <Text style={styles.mealIcon}>{m.emoji}</Text>
+              <View style={styles.mealInfo}>
+                <Text style={styles.mealName}>{m.name}</Text>
+                <Text style={[styles.mealDesc, m.ai && { color: Colors.primary }]}>{m.desc}</Text>
+              </View>
+              <Text style={styles.mealKcal}>{m.kcal} kcal</Text>
+            </View>
+          ))}
+
+          <View style={styles.foodDivider} />
+
+          <View style={styles.foodActions}>
+            <Pressable style={[styles.foodBtnManual]}>
+              <Text style={styles.foodBtnManualText}>+ Manual</Text>
+              <View style={styles.badgeFree}><Text style={styles.badgeFreeText}>FREE</Text></View>
+            </Pressable>
+            <Pressable style={[styles.foodBtnAi, Shadow.primary]}>
+              <Text style={styles.foodBtnAiText}>📷 Foto IA</Text>
+              <View style={styles.badgePro}><Text style={styles.badgeProText}>PRO</Text></View>
+            </Pressable>
+          </View>
+        </View>
 
         <Text style={styles.disclaimer}>
           Estimativa educativa (t½ ≈ {med.halfLifeDays} dias). Não é aconselhamento médico.
@@ -280,26 +338,66 @@ const styles = StyleSheet.create({
   statUnit: { fontSize: 14, fontWeight: '400', color: Colors.textSecondary },
   statSub: { fontSize: 11, color: Colors.success, marginTop: 4, fontWeight: '500' },
 
-  historyCard: {
+  foodCard: {
     backgroundColor: Colors.bg, borderRadius: Radius.lg,
     borderWidth: 0.5, borderColor: Colors.border,
     overflow: 'hidden', marginBottom: Spacing.md,
   },
-  histTitle: {
-    fontSize: 14, fontWeight: '600', color: Colors.text,
-    padding: Spacing.md, paddingBottom: Spacing.sm,
-    borderBottomWidth: 0.5, borderBottomColor: Colors.border,
+  foodHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: Spacing.md, paddingVertical: Spacing.md,
   },
-  histRow: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+  foodHeaderLeft: { flex: 1, marginRight: 12 },
+  foodTitle: { fontSize: 18, fontWeight: '700', color: Colors.text, letterSpacing: -0.3 },
+  foodSub:   { fontSize: 12, color: Colors.textSecondary, marginTop: 3 },
+  foodRing: {
+    width: 44, height: 44,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  foodRingPct: { fontSize: 9, fontWeight: '700', color: Colors.primary },
+  foodDivider: { height: 0.5, backgroundColor: Colors.border },
+  macroSection: { paddingHorizontal: Spacing.md, paddingVertical: 12, gap: 8 },
+  macroRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  macroLabel: { fontSize: 12, fontWeight: '500', color: Colors.textSecondary, width: 84, flexShrink: 0 },
+  macroTrack: { flex: 1, height: 5, backgroundColor: Colors.border, borderRadius: 3, overflow: 'hidden' },
+  macroFill:  { height: 5, borderRadius: 3 },
+  macroVal:   { fontSize: 14, fontWeight: '600', color: Colors.text, width: 36, textAlign: 'right', flexShrink: 0 },
+  mealRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 12,
     paddingHorizontal: Spacing.md, paddingVertical: 12,
     borderTopWidth: 0.5, borderTopColor: Colors.border,
   },
-  histLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  histDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Colors.primary },
-  histDotOld: { backgroundColor: Colors.textTertiary },
-  histDose: { fontSize: 14, fontWeight: '500', color: Colors.text },
-  histDate: { fontSize: 13, color: Colors.textSecondary },
+  mealIcon: { fontSize: 20, width: 28, textAlign: 'center' },
+  mealInfo: { flex: 1 },
+  mealName: { fontSize: 14, fontWeight: '600', color: Colors.text },
+  mealDesc: { fontSize: 12, color: Colors.textSecondary, marginTop: 1 },
+  mealKcal: { fontSize: 14, fontWeight: '600', color: Colors.textSecondary },
+  foodActions: {
+    flexDirection: 'row', gap: Spacing.sm, padding: Spacing.md,
+  },
+  foodBtnManual: {
+    flex: 1, backgroundColor: Colors.bgSecondary,
+    borderRadius: Radius.md, paddingVertical: 13,
+    borderWidth: 0.5, borderColor: Colors.border,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+  },
+  foodBtnManualText: { fontSize: 14, fontWeight: '600', color: Colors.text },
+  foodBtnAi: {
+    flex: 1, backgroundColor: Colors.primary,
+    borderRadius: Radius.md, paddingVertical: 13,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+  },
+  foodBtnAiText: { fontSize: 14, fontWeight: '600', color: '#fff' },
+  badgeFree: {
+    backgroundColor: Colors.border, borderRadius: 4,
+    paddingHorizontal: 5, paddingVertical: 1,
+  },
+  badgeFreeText: { fontSize: 9, fontWeight: '700', color: Colors.textSecondary },
+  badgePro: {
+    borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1,
+    backgroundColor: 'rgba(255,255,255,0.22)',
+  },
+  badgeProText: { fontSize: 9, fontWeight: '700', color: '#fff' },
 
   disclaimer: {
     fontSize: 11, color: Colors.textTertiary,
