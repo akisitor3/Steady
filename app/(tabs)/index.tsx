@@ -8,6 +8,8 @@ import { MEDICATIONS } from '@/constants/medications';
 import { Colors, Spacing, Radius, Shadow } from '@/constants/theme';
 import { bodyLevel, weeklyAccumulation, steadyState } from '@/lib/pk/engine';
 import { BodyLevelChart } from '@/components/BodyLevelChart';
+import { BioRespostaCard } from '@/components/BioRespostaCard';
+import { VFCGaugeCard } from '@/components/VFCGaugeCard';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WEEK_MS = 7 * DAY_MS;
@@ -206,6 +208,9 @@ export default function DosesScreen() {
             </Pressable>
           </View>
         </View>
+
+        <BioRespostaCard />
+        <VFCGaugeCard />
 
         <Text style={styles.disclaimer}>
           Estimativa educativa (t½ ≈ {med.halfLifeDays} dias). Não é aconselhamento médico.
