@@ -148,6 +148,7 @@
       --warning:      #D97706;
       --success:      #16A34A;
       --chartResidual: #85B7EB;
+      --colorSleep:   rgba(129,140,248,0.07);
       --shadow-sm:    0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
       --shadow-md:    0 2px 8px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
     }
@@ -711,6 +712,42 @@
     .meal-desc-ai { font-size: 12px; color: var(--text2); margin-top: 1px; }
     .ai-dot { color: var(--primary); font-weight: 600; }
 
+    /* ── Activity Monitor Card ───────────────────────── */
+    .activity-card {
+      background: var(--bg);
+      border-radius: 16px;
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 8px;
+    }
+    .activity-header {
+      display: flex; align-items: flex-start;
+      justify-content: space-between;
+      padding: 16px 16px 12px;
+    }
+    .activity-title { font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
+    .activity-sub   { font-size: 12px; color: var(--text3); margin-top: 4px; }
+    .activity-now   {
+      text-align: right;
+    }
+    .activity-now-label { font-size: 12px; font-weight: 600; color: var(--primary); letter-spacing: 0.5px; text-transform: uppercase; }
+    .activity-now-val   { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; margin-top: 4px; }
+    .activity-now-unit  { font-size: 12px; font-weight: 400; color: var(--text2); }
+    .activity-metrics {
+      display: flex; gap: 0;
+      border-top: 0.5px solid var(--border);
+    }
+    .activity-metric {
+      flex: 1; padding: 12px 16px;
+      border-right: 0.5px solid var(--border);
+    }
+    .activity-metric:last-child { border-right: none; }
+    .activity-metric-icon  { font-size: 14px; margin-bottom: 4px; }
+    .activity-metric-val   { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+    .activity-metric-unit  { font-size: 12px; color: var(--text3); font-weight: 400; }
+    .activity-metric-label { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
     /* Meal rows */
     .meal-row {
       display: flex;
@@ -1103,6 +1140,89 @@
         <div class="food-actions-home">
           <button class="food-btn-manual-home">+ Manual <span class="badge-free">FREE</span></button>
           <button class="food-btn-ai-home">📷 Foto IA <span class="badge-pro">PRO</span></button>
+        </div>
+      </div>
+
+      <!-- Activity Monitor Card -->
+      <div class="activity-card">
+        <div class="activity-header">
+          <div>
+            <div class="activity-title">Actividade de hoje</div>
+            <div class="activity-sub">Apple Health · WHOOP · actualizado 17:27</div>
+          </div>
+          <div class="activity-now">
+            <div class="activity-now-label">Activo</div>
+            <div class="activity-now-val">8 420<span class="activity-now-unit"> passos</span></div>
+          </div>
+        </div>
+
+        <!-- Chart SVG -->
+        <div style="position:relative; padding: 0 16px 8px;">
+          <!-- Event icons -->
+          <div style="position:relative; height:20px; margin-bottom:4px;">
+            <span style="position:absolute;left:2px;  font-size:11px;">🌙</span>
+            <span style="position:absolute;left:90px; font-size:11px;">🏃</span>
+            <span style="position:absolute;left:138px;font-size:11px;">🍽️</span>
+            <span style="position:absolute;left:196px;font-size:11px;">🍽️</span>
+            <span style="position:absolute;right:0px; font-size:10px;color:var(--text3);font-weight:500;">agora</span>
+          </div>
+          <svg width="100%" viewBox="0 0 310 80" style="display:block;">
+            <defs>
+              <linearGradient id="actGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" style="stop-color:var(--primary)" stop-opacity="0.12"/>
+                <stop offset="100%" style="stop-color:var(--primary)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Sleep zone -->
+            <rect x="0" y="0" width="72" height="68" style="fill:var(--colorSleep)" rx="2"/>
+            <!-- Grid lines -->
+            <line x1="0" y1="23" x2="296" y2="23" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
+            <line x1="0" y1="46" x2="296" y2="46" stroke="rgba(0,0,0,0.04)" stroke-width="1"/>
+            <!-- Area fill -->
+            <path d="M 0 58 C 18 57,36 55,52 50 C 60 47,66 38,72 32
+                     C 80 26,88 18,96 28 C 104 36,108 44,116 38
+                     C 124 32,128 24,136 30 C 144 36,148 42,156 38
+                     C 164 34,170 28,178 32 C 186 36,190 42,198 36
+                     C 206 30,212 24,220 30 C 228 36,234 44,242 40
+                     C 250 36,256 28,264 34 C 272 40,278 46,286 42 L 286 68 L 0 68 Z"
+              fill="url(#actGrad)"/>
+            <!-- Activity line -->
+            <path d="M 0 58 C 18 57,36 55,52 50 C 60 47,66 38,72 32
+                     C 80 26,88 18,96 28 C 104 36,108 44,116 38
+                     C 124 32,128 24,136 30 C 144 36,148 42,156 38
+                     C 164 34,170 28,178 32 C 186 36,190 42,198 36
+                     C 206 30,212 24,220 30 C 228 36,234 44,242 40
+                     C 250 36,256 28,264 34 C 272 40,278 46,286 42"
+              fill="none" style="stroke:var(--primary)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Current time dashed line -->
+            <line x1="286" y1="0" x2="286" y2="68" style="stroke:var(--primary)" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
+            <circle cx="286" cy="42" r="3" style="fill:var(--primary)"/>
+            <!-- Time labels -->
+            <text x="0"   y="78" font-size="9" style="fill:var(--text3)" font-family="Inter,sans-serif">00:00</text>
+            <text x="68"  y="78" font-size="9" style="fill:var(--text3)" font-family="Inter,sans-serif">06:00</text>
+            <text x="140" y="78" font-size="9" style="fill:var(--text3)" font-family="Inter,sans-serif">12:00</text>
+            <text x="212" y="78" font-size="9" style="fill:var(--text3)" font-family="Inter,sans-serif">17:00</text>
+            <text x="271" y="78" font-size="9" style="fill:var(--primary)" font-family="Inter,sans-serif" font-weight="600">17:27</text>
+          </svg>
+        </div>
+
+        <!-- 3 métricas -->
+        <div class="activity-metrics">
+          <div class="activity-metric">
+            <div class="activity-metric-icon">🌙</div>
+            <div class="activity-metric-val">7<span class="activity-metric-unit">h</span> 32<span class="activity-metric-unit">m</span></div>
+            <div class="activity-metric-label">Sono</div>
+          </div>
+          <div class="activity-metric">
+            <div class="activity-metric-icon">🏃</div>
+            <div class="activity-metric-val">8 420<span class="activity-metric-unit"> pass.</span></div>
+            <div class="activity-metric-label">Passos</div>
+          </div>
+          <div class="activity-metric">
+            <div class="activity-metric-icon">🍽️</div>
+            <div class="activity-metric-val">1 240<span class="activity-metric-unit"> kcal</span></div>
+            <div class="activity-metric-label">Calorias</div>
+          </div>
         </div>
       </div>
 
