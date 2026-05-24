@@ -5,8 +5,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "content=$(cat \"/Volumes/KHONSHU/Brain/Steady/LAST_SESSION.md\" 2>/dev/null | head -80) && printf \"%s\" \"$content\" | python3 -c \"import sys,json; print(json.dumps({'hookSpecificOutput':{'hookEventName':'SessionStart','additionalContext':'=== STEADY — ÚLTIMA SESSÃO ===\\n' + sys.stdin.read()}}))\"",
-            "statusMessage": "A carregar contexto do Steady..."
+            "command": "python3 -c \"\nimport json\ndef r(p,n):\n    try:\n        with open(p) as f: return f.read().split('\\n')[:n]\n    except: return []\nls = r('/Volumes/KHONSHU/Brain/Steady/LAST_SESSION.md', 80)\ntd = r('/Volumes/KHONSHU/Brain/Steady/todo.md', 60)\nmem = r('/Users/arkadiann/.claude/projects/-Users-arkadiann/memory/MEMORY.md', 40)\nctx = '=== STEADY — ÚLTIMA SESSÃO ===\\n' + '\\n'.join(ls)\nctx += '\\n\\n=== STEADY — TODO ACTIVO ===\\n' + '\\n'.join(td)\nctx += '\\n\\n=== CLAUDE MEMORY (índice) ===\\n' + '\\n'.join(mem)\nprint(json.dumps({'hookSpecificOutput':{'hookEventName':'SessionStart','additionalContext':ctx}}))\n\"",
+            "statusMessage": "A carregar contexto do Steady (sessão + todo + memory)..."
           }
         ]
       }
