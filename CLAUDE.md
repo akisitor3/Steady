@@ -48,9 +48,9 @@ constants/
 
 ## Skills de design (obrigatório para qualquer trabalho de UI)
 
-Antes de qualquer tarefa de UI/UX, carregar SEMPRE estas duas skills por esta ordem:
-1. `awesome-design-skills` — princípios de design premium
-2. `premium` — sistema visual Apple-inspired
+Antes de qualquer tarefa de UI/UX, ler SEMPRE este ficheiro antes de qualquer outra coisa:
+1. `.claude/skills/design-system/SKILL.md` — sistema visual premium do Steady (Apple-inspired)
+2. Skill `premium` do Claude Code — princípios de design premium adicionais
 
 **Identidade visual do Steady:**
 - Inspiração: Apple — branco, tipografia Inter, espaço, precisão
@@ -69,7 +69,7 @@ Só avançar se não houver findings críticos ou altos por resolver.
 
 ## Regras de trabalho
 
-1. **Código activo no SSD.** Se `/Users/arkadiann/Documents/steady-mvp V1.5/` não existir, clonar de `https://github.com/akisitor3/Steady`. Nunca trabalhar a partir do disco externo KHONSHU.
+1. **Fonte de verdade: GitHub.** Trabalhar sempre a partir do clone de `https://github.com/akisitor3/Steady` (branch `main`). Antes de qualquer sessão, fazer `git pull` para garantir que o código local está actualizado.
 2. **Design system:** cor primária é `#0F6E56` (override do `#3B82F6` da skill premium). Usar gradiente `linear-gradient(145deg, #1D9E75, #0F6E56, #0A5240)`.
 3. Após cada commit: actualizar `/Volumes/KHONSHU/Brain/Steady/LAST_SESSION.md` + `lessons/` + `todo.md`.
 4. Mockups de referência: `preview-dashboard.html` e `preview-mood-diary.html` na raiz do projecto.
