@@ -1,3 +1,4 @@
+import React from 'react';
 import { useWindowDimensions } from 'react-native';
 import Svg, { Rect, Line } from 'react-native-svg';
 import { WeekPoint } from '@/lib/pk/engine';
@@ -41,22 +42,22 @@ export function HeroPKChart({ weekly, ss }: Props) {
 
         return (
           <React.Fragment key={p.week}>
-            {/* Residual bar (bottom) */}
+            {/* Residual bar (base da pilha) */}
             {residualH > 0 && (
               <Rect
                 x={x}
-                y={VIEW_H - residualH - freshH}
+                y={VIEW_H - residualH}
                 width={barW}
                 height={residualH}
                 fill="rgba(255,255,255,0.30)"
                 rx={1}
               />
             )}
-            {/* Fresh bar (top) */}
+            {/* Fresh bar (topo da pilha) */}
             {freshH > 0 && (
               <Rect
                 x={x}
-                y={VIEW_H - freshH}
+                y={VIEW_H - residualH - freshH}
                 width={barW}
                 height={freshH}
                 fill="rgba(255,255,255,0.80)"
@@ -82,5 +83,3 @@ export function HeroPKChart({ weekly, ss }: Props) {
   );
 }
 
-// React needs to be in scope for JSX (React Native 0.76 still needs it for Fragment)
-import React from 'react';

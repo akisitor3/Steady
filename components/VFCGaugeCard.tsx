@@ -46,7 +46,7 @@ export function VFCGaugeCard() {
           </LinearGradient>
           {/* Needle fade: transparente → branco */}
           <LinearGradient id="vfc-needle" gradientUnits="userSpaceOnUse"
-            x1="139" y1="128" x2={needleX2} y2={needleY2}>
+            x1={179} y1={196} x2={needleX2} y2={needleY2}>
             <Stop offset="0%"   stopColor="white" stopOpacity={0} />
             <Stop offset="100%" stopColor="white" stopOpacity={1} />
           </LinearGradient>
@@ -76,7 +76,7 @@ export function VFCGaugeCard() {
 
         {/* Agulha com fade a branco */}
         <Line
-          x1={139} y1={128} x2={needleX2} y2={needleY2}
+          x1={179} y1={196} x2={needleX2} y2={needleY2}
           stroke="url(#vfc-needle)"
           strokeWidth={4} strokeLinecap="round"
         />
