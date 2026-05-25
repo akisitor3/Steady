@@ -4,10 +4,13 @@ import {
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { useApp } from '@/lib/store/useApp';
+import { useWeightStore } from '@/lib/store/useWeightStore';
 import { MEDICATIONS } from '@/constants/medications';
 import { Colors, Spacing, Radius, Shadow } from '@/constants/theme';
 import { bodyLevel, weeklyAccumulation, steadyState } from '@/lib/pk/engine';
 import { BodyLevelChart } from '@/components/BodyLevelChart';
+import { HeroPKChart } from '@/components/HeroPKChart';
+import { IntraWeekChart } from '@/components/IntraWeekChart';
 import { BioRespostaCard } from '@/components/BioRespostaCard';
 import { VFCGaugeCard } from '@/components/VFCGaugeCard';
 
@@ -16,11 +19,15 @@ const WEEK_MS = 7 * DAY_MS;
 
 export default function DosesScreen() {
   const { injections, medication, loadInjections, addInjection } = useApp();
+  const { weights, loadWeights } = useWeightStore();
   const [modal, setModal] = useState(false);
   const med = MEDICATIONS[medication];
   const now = Date.now();
 
-  useEffect(() => { loadInjections(); }, []);
+  useEffect(() => {
+    loadInjections();
+    loadWeights();
+  }, []);
 
   const levelNow = useMemo(
     () => bodyLevel(injections, now, med.halfLifeDays),
@@ -30,6 +37,12 @@ export default function DosesScreen() {
     () => weeklyAccumulation(injections, med.halfLifeDays),
     [injections, med]
   );
+
+  const latestWeight = weights.length ? weights[weights.length - 1].weight_kg : null;
+  const firstWeight = weights.length ? weights[0].weight_kg : null;
+  const weightDelta = latestWeight !== null && firstWeight !== null
+    ? Math.round((latestWeight - firstWeight) * 10) / 10
+    : null;
 
   const lastInj = injections.length ? injections[injections.length - 1] : null;
   const lastDose = lastInj?.doseMg ?? 0;
@@ -101,6 +114,7 @@ export default function DosesScreen() {
               </View>
             </View>
           )}
+          <HeroPKChart weekly={weekly} ss={ss} />
           <View style={styles.progressTrack}>
             <View style={[styles.progressFill, { width: `${weekProgress * 100}%` as any }]} />
           </View>
@@ -119,19 +133,41 @@ export default function DosesScreen() {
             {ss > 0 && <Text style={styles.statSub}>SS {ss.toFixed(1)} mg</Text>}
           </View>
           <View style={[styles.stat, Shadow.sm]}>
-            <Text style={styles.statLabel}>INJEÇÕES</Text>
-            <Text style={styles.statValue}>
-              {injections.length}<Text style={styles.statUnit}> total</Text>
-            </Text>
-            <Text style={styles.statSub}>
-              {injections.length > 0
-                ? `Semana ${injections.length}`
-                : 'Sem registos'}
-            </Text>
+            <Text style={styles.statLabel}>PESO ACTUAL</Text>
+            {latestWeight !== null ? (
+              <>
+                <Text style={styles.statValue}>
+                  {latestWeight.toFixed(1)}<Text style={styles.statUnit}> kg</Text>
+                </Text>
+                <Text style={[
+                  styles.statSub,
+                  weightDelta !== null && weightDelta < 0
+                    ? { color: Colors.success }
+                    : weightDelta !== null && weightDelta > 0
+                    ? { color: Colors.danger }
+                    : { color: Colors.textTertiary },
+                ]}>
+                  {weightDelta === null
+                    ? 'Sem variação'
+                    : weightDelta < 0
+                    ? `▼ ${Math.abs(weightDelta).toFixed(1)} kg`
+                    : weightDelta > 0
+                    ? `▲ ${weightDelta.toFixed(1)} kg`
+                    : '—'}
+                </Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.statValue}>—</Text>
+                <Text style={[styles.statSub, { color: Colors.textTertiary }]}>Sem registos</Text>
+              </>
+            )}
           </View>
         </View>
 
         <BodyLevelChart data={weekly} />
+
+        <IntraWeekChart />
 
         {/* Food Tracking Card */}
         <View style={[styles.foodCard, Shadow.sm]}>
