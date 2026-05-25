@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { MEDICATIONS, MedKey } from '@/constants/medications';
 import * as db from '@/lib/db';
 import { Injection } from '@/lib/pk/engine';
-import { requestNotificationPermissions, scheduleInjectionReminder } from '@/lib/notifications';
+import { requestNotificationPermissions, scheduleInjectionReminder, cancelInjectionReminder } from '@/lib/notifications';
 
 interface AppState {
   medication: MedKey;
@@ -29,7 +29,7 @@ export const useApp = create<AppState>((set, get) => ({
     }
     const rows = await db.getInjections();
     set({
-      injections: rows.map((r) => ({ id: r.id, date: r.date, doseMg: r.dose_mg })),
+      injections: rows.map((r) => ({ id: r.id, date: r.date, doseMg: r.dose_mg })).sort((a, b) => a.date - b.date),
       loaded: true,
     });
     if (isFirstLoad && rows.length > 0) {
@@ -51,6 +51,13 @@ export const useApp = create<AppState>((set, get) => ({
   removeInjection: async (id) => {
     await db.deleteInjection(id);
     await get().loadInjections();
+    const { injections } = get();
+    if (injections.length === 0) {
+      cancelInjectionReminder();
+    } else {
+      const latest = injections[injections.length - 1];
+      scheduleInjectionReminder(latest.date + 7 * 24 * 60 * 60 * 1000);
+    }
   },
 }));
 

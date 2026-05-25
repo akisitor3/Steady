@@ -43,11 +43,12 @@ function rowToMeal(row: db.MealRow): Meal {
   };
 }
 
-export const useFoodStore = create<FoodState>((set) => ({
+export const useFoodStore = create<FoodState>((set, get) => ({
   meals: [],
   loaded: false,
 
   loadMeals: async () => {
+    if (get().loaded) return;
     const dayStart = getDayStart();
     const rows = await db.getMealsForDay(dayStart);
     set({ meals: rows.map(rowToMeal), loaded: true });

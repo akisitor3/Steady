@@ -84,6 +84,7 @@ const bar = StyleSheet.create({
 export default function FoodScreen() {
   const { meals, loadMeals, saveMeal: storeSaveMeal, deleteMeal } = useFoodStore();
   const [activeSlot, setActiveSlot] = useState<typeof SLOTS[number] | null>(null);
+  const [existingMealId, setExistingMealId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: '', desc: '', kcal: '', prot: '', carbs: '', fat: '' });
 
   useEffect(() => { loadMeals(); }, []);
@@ -99,6 +100,7 @@ export default function FoodScreen() {
 
   function openSlot(slot: typeof SLOTS[number]) {
     const existing = meals.find((m) => m.slot === slot.key);
+    setExistingMealId(existing?.id ?? null);
     setForm(existing
       ? { name: existing.name, desc: existing.desc, kcal: String(existing.kcal), prot: String(existing.prot), carbs: String(existing.carbs), fat: String(existing.fat) }
       : { name: slot.label, desc: '', kcal: '', prot: '', carbs: '', fat: '' }
@@ -109,7 +111,7 @@ export default function FoodScreen() {
   function saveMeal() {
     if (!activeSlot || !form.kcal) return;
     const meal: Meal = {
-      id: Date.now().toString(),
+      id: existingMealId ?? Date.now().toString(),
       slot: activeSlot.key,
       name: form.name || activeSlot.label,
       desc: form.desc,

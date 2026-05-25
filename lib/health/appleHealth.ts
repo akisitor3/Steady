@@ -19,7 +19,7 @@ const MOCK_DATA: HealthData = {
   sleepMinutes: 32,
   steps: 8420,
   calories: 1240,
-  hrvValue: 42.5,
+  hrvValue: 0.7,
   hrvStatus: 'BAIXO',
   bioScore: 72,
   bioLabel: 'BOM',

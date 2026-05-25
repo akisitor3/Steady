@@ -16,7 +16,7 @@ export async function requestNotificationPermissions(): Promise<boolean> {
 }
 
 export async function scheduleInjectionReminder(nextDateMs: number): Promise<void> {
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  await Notifications.cancelScheduledNotificationAsync(INJECTION_REMINDER_TAG);
 
   if (nextDateMs <= Date.now()) return;
 
@@ -37,5 +37,5 @@ export async function scheduleInjectionReminder(nextDateMs: number): Promise<voi
 }
 
 export async function cancelInjectionReminder(): Promise<void> {
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  await Notifications.cancelScheduledNotificationAsync(INJECTION_REMINDER_TAG);
 }

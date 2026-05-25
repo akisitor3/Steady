@@ -1,7 +1,8 @@
 import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
-import Svg, { Path, Defs, LinearGradient, Stop, Polyline, Line, Circle } from 'react-native-svg';
-import { useApp, currentMed } from '@/lib/store/useApp';
+import Svg, { Path, Defs, LinearGradient, Stop, Line, Circle } from 'react-native-svg';
+import { useApp } from '@/lib/store/useApp';
 import { intraWeekCurve } from '@/lib/pk/engine';
+import { MEDICATIONS } from '@/constants/medications';
 import { Colors, Spacing, Radius, Shadow } from '@/constants/theme';
 
 const CHART_H = 80;
@@ -11,7 +12,8 @@ const PAD_TOP = 6;
 const PAD_BOTTOM = 16;
 
 export function IntraWeekChart() {
-  const { injections } = useApp();
+  const { injections, medication } = useApp();
+  const med = MEDICATIONS[medication];
   const { width: screenWidth } = useWindowDimensions();
   // card has 16px horizontal margins on screen + 16px internal padding each side
   const svgWidth = screenWidth - 32 - 32;
@@ -30,7 +32,6 @@ export function IntraWeekChart() {
     );
   }
 
-  const med = currentMed();
   const curve = intraWeekCurve(injections, med.halfLifeDays);
 
   if (curve.length === 0) {

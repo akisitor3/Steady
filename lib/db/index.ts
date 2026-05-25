@@ -1,13 +1,16 @@
 import * as SQLite from 'expo-sqlite';
 
 // BD local on-device. Sem nuvem, sem contas — privacidade primeiro.
-let db: SQLite.SQLiteDatabase | null = null;
+let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
-export async function getDb(): Promise<SQLite.SQLiteDatabase> {
-  if (db) return db;
-  db = await SQLite.openDatabaseAsync('steady.db');
-  await migrate(db);
-  return db;
+export function getDb(): Promise<SQLite.SQLiteDatabase> {
+  if (!dbPromise) {
+    dbPromise = SQLite.openDatabaseAsync('steady.db').then(async (d) => {
+      await migrate(d);
+      return d;
+    });
+  }
+  return dbPromise;
 }
 
 async function migrate(d: SQLite.SQLiteDatabase) {
