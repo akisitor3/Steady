@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import Svg, {
   Circle, Line, Rect, Path,
@@ -5,6 +6,7 @@ import Svg, {
   Stop, ClipPath, G,
 } from 'react-native-svg';
 import { Colors, Spacing, Radius, Shadow } from '@/constants/theme';
+import { useHealthStore } from '@/lib/health/appleHealth';
 
 const VBOX_W = 330;
 const VBOX_H = 110;
@@ -14,6 +16,16 @@ export function BioRespostaCard() {
   const chartW = screenWidth - Spacing.md * 2;
   const chartH = Math.round(chartW * VBOX_H / VBOX_W);
 
+  const { data, loaded } = useHealthStore();
+
+  useEffect(() => {
+    if (!loaded) {
+      useHealthStore.getState().load();
+    }
+  }, []);
+
+  const filled = Math.round((data?.bioRingFill ?? 0.72) * 126);
+
   return (
     <View style={styles.card}>
 
@@ -21,7 +33,7 @@ export function BioRespostaCard() {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Text style={styles.title}>Bio Resposta</Text>
-          <Text style={styles.subtitle}>Apple Health · WHOOP · actualizado 17:27</Text>
+          <Text style={styles.subtitle}>{`Apple Health · WHOOP · actualizado ${data?.lastUpdated ?? '—'}`}</Text>
         </View>
         <Svg width={48} height={48} viewBox="0 0 48 48">
           <Defs>
@@ -36,14 +48,14 @@ export function BioRespostaCard() {
           <Circle
             cx={24} cy={24} r={20}
             fill="none" stroke="url(#br-ring)"
-            strokeWidth={3.5} strokeDasharray="91 126"
+            strokeWidth={3.5} strokeDasharray={`${filled} 126`}
             strokeLinecap="round"
             rotation={-90} origin="24, 24"
           />
           <SvgText x={24} y={25} fontSize={12} fontWeight="700" fill={Colors.text}
-            textAnchor="middle">72</SvgText>
+            textAnchor="middle">{data?.bioScore ?? 72}</SvgText>
           <SvgText x={24} y={33} fontSize={7} fontWeight="700" fill={Colors.primary}
-            textAnchor="middle">BOM</SvgText>
+            textAnchor="middle">{data?.bioLabel ?? 'BOM'}</SvgText>
         </Svg>
       </View>
 
@@ -127,21 +139,21 @@ export function BioRespostaCard() {
         <View style={[styles.metric, styles.metricBorder]}>
           <Text style={styles.metricIcon}>🌙</Text>
           <Text style={styles.metricVal}>
-            7<Text style={styles.metricUnit}>h</Text>{' '}32<Text style={styles.metricUnit}>m</Text>
+            {data?.sleepHours ?? 7}<Text style={styles.metricUnit}>h</Text>{' '}{data?.sleepMinutes ?? 32}<Text style={styles.metricUnit}>m</Text>
           </Text>
           <Text style={styles.metricLabel}>Sono</Text>
         </View>
         <View style={[styles.metric, styles.metricBorder]}>
           <Text style={styles.metricIcon}>🏃</Text>
           <Text style={styles.metricVal}>
-            8 420<Text style={styles.metricUnit}> pass.</Text>
+            {data?.steps.toLocaleString('pt-PT') ?? '—'}<Text style={styles.metricUnit}> pass.</Text>
           </Text>
           <Text style={styles.metricLabel}>Passos</Text>
         </View>
         <View style={styles.metric}>
           <Text style={styles.metricIcon}>🍽️</Text>
           <Text style={styles.metricVal}>
-            1 240<Text style={styles.metricUnit}> kcal</Text>
+            {data?.calories.toLocaleString('pt-PT') ?? '—'}<Text style={styles.metricUnit}> kcal</Text>
           </Text>
           <Text style={styles.metricLabel}>Calorias</Text>
         </View>

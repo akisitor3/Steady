@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
 import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import Svg, {
   Path, Line, Text as SvgText, Defs,
   LinearGradient, Stop,
 } from 'react-native-svg';
 import { Colors, Spacing, Radius, Shadow } from '@/constants/theme';
+import { useHealthStore } from '@/lib/health/appleHealth';
 
 const VBOX_W = 358;
 const VBOX_H = 173;
@@ -14,10 +16,23 @@ export function VFCGaugeCard() {
   const svgW = screenWidth - Spacing.md * 2;
   const svgH = Math.round(svgW * VBOX_H / VBOX_W);
 
+  const { data, loaded } = useHealthStore();
+
+  useEffect(() => {
+    if (!loaded) {
+      useHealthStore.getState().load();
+    }
+  }, []);
+
+  const angle = -90 + (data?.hrvValue ?? 0.7) / 3.0 * 180;
+  const rad = (angle * Math.PI) / 180;
+  const needleX2 = 179 + 70 * Math.cos(rad);
+  const needleY2 = 196 + 70 * Math.sin(rad);
+
   return (
     <View style={styles.card}>
       <Text style={styles.title}>Variabilidade Freq. Cardíaca</Text>
-      <Text style={styles.subtitle}>WHOOP · actualizado 17:27</Text>
+      <Text style={styles.subtitle}>{`WHOOP · actualizado ${data?.lastUpdated ?? '—'}`}</Text>
 
       <Svg width={svgW} height={svgH} viewBox={`0 ${VBOX_OFFSET_Y} ${VBOX_W} ${VBOX_H}`}>
         <Defs>
@@ -31,7 +46,7 @@ export function VFCGaugeCard() {
           </LinearGradient>
           {/* Needle fade: transparente → branco */}
           <LinearGradient id="vfc-needle" gradientUnits="userSpaceOnUse"
-            x1="139" y1="128" x2="82" y2="101">
+            x1="139" y1="128" x2={needleX2} y2={needleY2}>
             <Stop offset="0%"   stopColor="white" stopOpacity={0} />
             <Stop offset="100%" stopColor="white" stopOpacity={1} />
           </LinearGradient>
@@ -61,7 +76,7 @@ export function VFCGaugeCard() {
 
         {/* Agulha com fade a branco */}
         <Line
-          x1={139} y1={128} x2={82} y2={101}
+          x1={139} y1={128} x2={needleX2} y2={needleY2}
           stroke="url(#vfc-needle)"
           strokeWidth={4} strokeLinecap="round"
         />
@@ -71,21 +86,21 @@ export function VFCGaugeCard() {
           x={179} y={148}
           fontSize={40} fontWeight="700" fill={Colors.text}
           textAnchor="middle" letterSpacing={-1}
-        >0.7</SvgText>
+        >{(data?.hrvValue ?? 0.7).toFixed(1)}</SvgText>
 
         {/* Status */}
         <SvgText
           x={179} y={165}
           fontSize={11} fontWeight="600" fill="#29B6F6"
           textAnchor="middle" letterSpacing={1.5}
-        >BAIXO</SvgText>
+        >{data?.hrvStatus ?? 'BAIXO'}</SvgText>
 
         {/* Timestamp */}
         <SvgText
           x={179} y={180}
           fontSize={11} fill={Colors.textTertiary}
           textAnchor="middle"
-        >17:27</SvgText>
+        >{data?.lastUpdated ?? '—'}</SvgText>
 
         {/* Labels escala */}
         <SvgText x={84}  y={204} fontSize={10} fill={Colors.textTertiary} textAnchor="middle">0.0</SvgText>
