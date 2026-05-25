@@ -49,6 +49,19 @@ async function migrate(d: SQLite.SQLiteDatabase) {
       medication TEXT,
       units TEXT DEFAULT 'kg'
     );
+
+    CREATE TABLE IF NOT EXISTS meals (
+      id TEXT PRIMARY KEY NOT NULL,
+      date INTEGER NOT NULL,
+      slot TEXT NOT NULL,
+      name TEXT NOT NULL,
+      desc TEXT,
+      kcal REAL NOT NULL DEFAULT 0,
+      prot REAL NOT NULL DEFAULT 0,
+      carbs REAL NOT NULL DEFAULT 0,
+      fat REAL NOT NULL DEFAULT 0,
+      by_ai INTEGER NOT NULL DEFAULT 0
+    );
   `);
 }
 
@@ -93,4 +106,39 @@ export async function addWeight(row: WeightRow) {
 export async function getWeights(): Promise<WeightRow[]> {
   const d = await getDb();
   return d.getAllAsync<WeightRow>('SELECT * FROM weights ORDER BY date ASC');
+}
+
+// ---- Refeições ----
+export interface MealRow {
+  id: string;
+  date: number;
+  slot: string;
+  name: string;
+  desc: string | null;
+  kcal: number;
+  prot: number;
+  carbs: number;
+  fat: number;
+  by_ai: number;
+}
+
+export async function getMealsForDay(dayStart: number): Promise<MealRow[]> {
+  const d = await getDb();
+  return d.getAllAsync<MealRow>(
+    'SELECT * FROM meals WHERE date = ? ORDER BY slot ASC',
+    [dayStart]
+  );
+}
+
+export async function saveMeal(row: MealRow): Promise<void> {
+  const d = await getDb();
+  await d.runAsync(
+    'INSERT OR REPLACE INTO meals (id, date, slot, name, desc, kcal, prot, carbs, fat, by_ai) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [row.id, row.date, row.slot, row.name, row.desc, row.kcal, row.prot, row.carbs, row.fat, row.by_ai]
+  );
+}
+
+export async function deleteMeal(id: string): Promise<void> {
+  const d = await getDb();
+  await d.runAsync('DELETE FROM meals WHERE id = ?', [id]);
 }

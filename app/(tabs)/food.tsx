@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Pressable, Modal, SafeAreaView,
   TextInput, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { Colors, Spacing, Radius, Shadow } from '@/constants/theme';
+import { useFoodStore } from '@/lib/store/useFoodStore';
 
 type MealSlot = 'breakfast' | 'lunch' | 'snack' | 'dinner';
 
@@ -25,12 +26,6 @@ const SLOTS: { key: MealSlot; label: string; emoji: string }[] = [
   { key: 'lunch',     label: 'Almoço',         emoji: '🍱' },
   { key: 'snack',     label: 'Lanche',          emoji: '📷' },
   { key: 'dinner',    label: 'Jantar',          emoji: '🌙' },
-];
-
-const INITIAL_MEALS: Meal[] = [
-  { id: '1', slot: 'breakfast', name: 'Pequeno-almoço', desc: 'Aveia + fruta · manual',       kcal: 420, prot: 30, carbs: 68, fat: 8 },
-  { id: '2', slot: 'lunch',     name: 'Almoço',         desc: 'Frango + arroz · manual',      kcal: 680, prot: 48, carbs: 82, fat: 22 },
-  { id: '3', slot: 'snack',     name: 'Lanche',         desc: 'iogurte grego',                kcal: 210, prot: 20, carbs: 24, fat: 5,  byAi: true },
 ];
 
 const PROT_GOAL  = 150;
@@ -87,9 +82,11 @@ const bar = StyleSheet.create({
 });
 
 export default function FoodScreen() {
-  const [meals, setMeals] = useState<Meal[]>(INITIAL_MEALS);
+  const { meals, loadMeals, saveMeal: storeSaveMeal, deleteMeal } = useFoodStore();
   const [activeSlot, setActiveSlot] = useState<typeof SLOTS[number] | null>(null);
   const [form, setForm] = useState({ name: '', desc: '', kcal: '', prot: '', carbs: '', fat: '' });
+
+  useEffect(() => { loadMeals(); }, []);
 
   const totalKcal  = meals.reduce((s, m) => s + m.kcal, 0);
   const totalProt  = meals.reduce((s, m) => s + m.prot, 0);
@@ -121,12 +118,7 @@ export default function FoodScreen() {
       carbs: Number(form.carbs) || 0,
       fat: Number(form.fat) || 0,
     };
-    setMeals((prev) => {
-      const rest = prev.filter((m) => m.slot !== activeSlot.key);
-      return [...rest, meal].sort(
-        (a, b) => SLOTS.findIndex((s) => s.key === a.slot) - SLOTS.findIndex((s) => s.key === b.slot)
-      );
-    });
+    storeSaveMeal(meal);
     setActiveSlot(null);
   }
 
