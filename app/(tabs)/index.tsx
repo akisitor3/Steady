@@ -2,12 +2,14 @@ import { useEffect, useState, useMemo } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Pressable, Modal, SafeAreaView,
 } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle } from 'react-native-svg';
 import { useApp } from '@/lib/store/useApp';
 import { useWeightStore } from '@/lib/store/useWeightStore';
 import { MEDICATIONS } from '@/constants/medications';
-import { Colors, Spacing, Radius, Shadow } from '@/constants/theme';
-import { bodyLevel, weeklyAccumulation, steadyState } from '@/lib/pk/engine';
+import { Colors, Font, Spacing, Radius, Shadow } from '@/constants/theme';
+import { bodyLevel, steadyState } from '@/lib/pk/engine';
 import { BodyLevelChart } from '@/components/BodyLevelChart';
 import { HeroPKChart } from '@/components/HeroPKChart';
 import { IntraWeekChart } from '@/components/IntraWeekChart';
@@ -16,6 +18,18 @@ import { VFCGaugeCard } from '@/components/VFCGaugeCard';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const WEEK_MS = 7 * DAY_MS;
+
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const DIAS_SEMANA = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+
+function fmtFull(ms: number) {
+  const d = new Date(ms);
+  return `${DIAS_SEMANA[d.getDay()]}, ${d.getDate()} ${MESES[d.getMonth()]}`;
+}
+function fmtShort(ms: number) {
+  const d = new Date(ms);
+  return `${d.getDate()} ${MESES[d.getMonth()]}`;
+}
 
 export default function DosesScreen() {
   const { injections, medication, loadInjections, addInjection } = useApp();
@@ -33,11 +47,6 @@ export default function DosesScreen() {
     () => bodyLevel(injections, now, med.halfLifeDays),
     [injections, med]
   );
-  const weekly = useMemo(
-    () => weeklyAccumulation(injections, med.halfLifeDays),
-    [injections, med]
-  );
-
   const latestWeight = weights.length ? weights[weights.length - 1].weight_kg : null;
   const firstWeight = weights.length ? weights[0].weight_kg : null;
   const weightDelta = latestWeight !== null && firstWeight !== null
@@ -60,17 +69,17 @@ export default function DosesScreen() {
     return residual + lastDose;
   }, [injections, med, nextDate, lastDose]);
   const daysLeft = nextDate ? Math.max(0, Math.ceil((nextDate - now) / DAY_MS)) : null;
-  const weekProgress = lastInj ? Math.min(1, (now - lastInj.date) / WEEK_MS) : 0;
 
   const nextLabel = () => {
     if (daysLeft === null) return 'Regista a primeira injeção';
     if (daysLeft === 0) return 'Hoje!';
     if (daysLeft === 1) return 'Amanhã';
-    return `em ${daysLeft} dias`;
+    return `${daysLeft} dias`;
   };
 
   return (
     <SafeAreaView style={styles.safe}>
+      <StatusBar style="light" />
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
 
         <View style={styles.header}>
@@ -85,44 +94,62 @@ export default function DosesScreen() {
           </View>
         </View>
 
-        <View style={[styles.hero, Shadow.primary]}>
-          <Text style={styles.heroLabel}>PRÓXIMA INJEÇÃO</Text>
-          <Text style={styles.heroValue}>{nextLabel()}</Text>
-          {lastInj && (
-            <Text style={styles.heroSub}>
-              Última: {new Date(lastInj.date).toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' })}
-              {'  ·  '}{lastInj.doseMg} mg
-            </Text>
-          )}
-          {lastInj && (
-            <View style={styles.heroPillRow}>
-              <View style={styles.heroPillItem}>
-                <Text style={styles.heroPillVal}>{levelNow.toFixed(1)}</Text>
-                <Text style={styles.heroPillLbl}>Hoje</Text>
-              </View>
-              <Text style={styles.heroPillArr}>→</Text>
-              <View style={styles.heroPillItem}>
-                <Text style={styles.heroPillVal}>{levelTomorrow.toFixed(1)}</Text>
-                <Text style={styles.heroPillLbl}>Amanhã</Text>
-              </View>
-              <Text style={styles.heroPillArr}>→</Text>
-              <View style={styles.heroPillItem}>
-                <Text style={[styles.heroPillVal, styles.heroPillValDim]}>
-                  {levelNextDose ? levelNextDose.toFixed(1) : '—'}
+        <LinearGradient
+          colors={['#1D9E75', '#0F6E56', '#0A5240']}
+          locations={[0, 0.52, 1]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.hero, Shadow.primary]}
+        >
+          {/* Top row: esquerda (label + valor + sub) | direita (pills) */}
+          <View style={styles.heroTop}>
+            <View style={styles.heroLeft}>
+              <Text style={styles.heroLabel}>PRÓXIMA INJEÇÃO</Text>
+              <Text style={styles.heroValue}>{nextLabel()}</Text>
+              {nextDate && lastInj && (
+                <Text style={styles.heroSub} numberOfLines={1}>
+                  {fmtFull(nextDate)} · {lastInj.doseMg.toFixed(1)} mg
                 </Text>
-                <Text style={styles.heroPillLbl}>Próx. dose</Text>
-              </View>
+              )}
             </View>
-          )}
-          <HeroPKChart weekly={weekly} ss={ss} />
-          <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${weekProgress * 100}%` as any }]} />
+            {lastInj && (
+              <View style={styles.heroPillRow}>
+                <View style={styles.heroPillItem}>
+                  <Text style={styles.heroPillVal}>{levelNow.toFixed(1)}</Text>
+                  <Text style={styles.heroPillLbl}>Hoje</Text>
+                </View>
+                <Text style={styles.heroPillArr}>→</Text>
+                <View style={styles.heroPillItem}>
+                  <Text style={styles.heroPillValDim}>{levelTomorrow.toFixed(1)}</Text>
+                  <Text style={styles.heroPillLbl}>Amanhã</Text>
+                </View>
+                <View style={styles.heroPillDivider} />
+                <View style={styles.heroPillItem}>
+                  <Text style={styles.heroPillValAccent}>
+                    {levelNextDose ? levelNextDose.toFixed(1) : '—'}
+                  </Text>
+                  <Text style={styles.heroPillLblAccent}>Próx. dose</Text>
+                </View>
+              </View>
+            )}
           </View>
-          <View style={styles.progressLabels}>
-            <Text style={styles.progressLabel}>Início semana</Text>
-            <Text style={styles.progressLabel}>Dia 7</Text>
+
+          <HeroPKChart injections={injections} halfLifeDays={med.halfLifeDays} />
+
+          {/* Footer */}
+
+          <View style={styles.heroFooter}>
+            <Text style={styles.footL}>
+              {lastInj ? `Última: ${fmtShort(lastInj.date)}` : ''}
+            </Text>
+            {nextDate && (
+              <View style={styles.footRRow}>
+                <View style={styles.footDot} />
+                <Text style={styles.footR}>Próxima: {fmtShort(nextDate)}</Text>
+              </View>
+            )}
           </View>
-        </View>
+        </LinearGradient>
 
         <View style={styles.cardsRow}>
           <View style={[styles.stat, Shadow.sm]}>
@@ -165,7 +192,7 @@ export default function DosesScreen() {
           </View>
         </View>
 
-        <BodyLevelChart data={weekly} />
+        <BodyLevelChart injections={injections} halfLifeDays={med.halfLifeDays} />
 
         <IntraWeekChart />
 
@@ -304,66 +331,66 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between',
     alignItems: 'flex-start', marginBottom: Spacing.lg,
   },
-  h1: { fontSize: 30, fontWeight: '700', color: Colors.primary, letterSpacing: -0.5 },
+  h1: { fontSize: 30, fontFamily: Font.bold, color: Colors.primary, letterSpacing: -0.5 },
   medBadge: {
     backgroundColor: Colors.primarySoft, borderRadius: 20,
     paddingHorizontal: 10, paddingVertical: 4,
     marginTop: 4, alignSelf: 'flex-start',
   },
-  medBadgeText: { fontSize: 12, fontWeight: '500', color: Colors.primary },
+  medBadgeText: { fontSize: 12, fontFamily: Font.medium, color: Colors.primary },
   avatar: {
     width: 38, height: 38, borderRadius: 19,
     backgroundColor: Colors.primary,
     alignItems: 'center', justifyContent: 'center',
   },
-  avatarText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  avatarText: { color: '#fff', fontFamily: Font.bold, fontSize: 15 },
 
   hero: {
-    backgroundColor: Colors.primary,
     borderRadius: Radius.xl,
-    padding: Spacing.lg,
+    padding: 20,
+    paddingBottom: 16,
     marginBottom: Spacing.md,
   },
-  heroLabel: {
-    fontSize: 10, fontWeight: '600',
-    color: 'rgba(255,255,255,0.7)', letterSpacing: 0.8, marginBottom: 4,
+  heroTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: 14,
+    marginBottom: 4,
   },
-  heroValue: { fontSize: 32, fontWeight: '700', color: '#fff', letterSpacing: -0.5 },
-  heroSub: { fontSize: 13, color: 'rgba(255,255,255,0.7)', marginTop: 4, marginBottom: Spacing.md },
+  heroLeft: { flex: 1, minWidth: 0 },
+  heroLabel: {
+    fontSize: 10, fontFamily: Font.semiBold,
+    color: 'rgba(255,255,255,0.52)', letterSpacing: 0.9, marginBottom: 5,
+    textTransform: 'uppercase',
+  },
+  heroValue: { fontSize: 32, fontFamily: Font.bold, color: '#fff', letterSpacing: -1, lineHeight: 34 },
+  heroSub: { fontSize: 12, color: 'rgba(255,255,255,0.62)', marginTop: 5, fontFamily: Font.regular, letterSpacing: -0.1 },
   heroPillRow: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.14)',
-    borderRadius: 11,
+    backgroundColor: 'rgba(255,255,255,0.13)',
+    borderRadius: 14,
     borderWidth: 0.5,
-    borderColor: 'rgba(255,255,255,0.22)',
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    gap: 6,
+    borderColor: 'rgba(255,255,255,0.10)',
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    gap: 4,
     alignItems: 'center',
-    alignSelf: 'flex-start',
-    marginBottom: Spacing.md,
+    flexShrink: 0,
   },
   heroPillItem: { alignItems: 'center' },
-  heroPillVal: {
-    fontSize: 12, fontWeight: '700', color: '#fff', letterSpacing: -0.2,
-  },
-  heroPillValDim: { color: 'rgba(255,255,255,0.50)', fontWeight: '600' },
-  heroPillLbl: {
-    fontSize: 8, color: 'rgba(255,255,255,0.55)', marginTop: 2, fontWeight: '500',
-  },
-  heroPillArr: {
-    fontSize: 9, color: 'rgba(255,255,255,0.35)', marginBottom: 11,
-  },
-
-  progressTrack: {
-    height: 4, backgroundColor: 'rgba(255,255,255,0.25)',
-    borderRadius: 2, overflow: 'hidden',
-  },
-  progressFill: { height: 4, backgroundColor: '#fff', borderRadius: 2 },
-  progressLabels: {
-    flexDirection: 'row', justifyContent: 'space-between', marginTop: 6,
-  },
-  progressLabel: { fontSize: 10, color: 'rgba(255,255,255,0.6)' },
+  heroPillVal: { fontSize: 13, fontFamily: Font.bold, color: '#fff', letterSpacing: -0.3 },
+  heroPillValDim: { fontSize: 12, fontFamily: Font.semiBold, color: 'rgba(255,255,255,0.42)' },
+  heroPillValAccent: { fontSize: 20, fontFamily: Font.extraBold, color: '#fff', letterSpacing: -0.6 },
+  heroPillLbl: { fontSize: 8.5, color: 'rgba(255,255,255,0.46)', marginTop: 2, fontFamily: Font.medium },
+  heroPillLblAccent: { fontSize: 8.5, color: 'rgba(255,255,255,0.62)', marginTop: 2, fontFamily: Font.medium },
+  heroPillArr: { fontSize: 8, color: 'rgba(255,255,255,0.28)', marginBottom: 13, paddingHorizontal: 2, fontFamily: Font.regular },
+  heroPillDivider: { width: 0.5, height: 32, backgroundColor: 'rgba(255,255,255,0.15)', marginHorizontal: 6 },
+  heroFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
+  footL: { fontSize: 11, color: 'rgba(255,255,255,0.40)', fontFamily: Font.regular },
+  footRRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  footDot: { width: 5, height: 5, borderRadius: 2.5, backgroundColor: 'rgba(255,255,255,0.55)' },
+  footR: { fontSize: 11, fontFamily: Font.semiBold, color: 'rgba(255,255,255,0.72)' },
 
   cardsRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.md },
   stat: {
@@ -372,12 +399,12 @@ const styles = StyleSheet.create({
     borderColor: Colors.border, padding: Spacing.md,
   },
   statLabel: {
-    fontSize: 10, fontWeight: '600', color: Colors.textTertiary,
+    fontSize: 10, fontFamily: Font.semiBold, color: Colors.textTertiary,
     letterSpacing: 0.5, marginBottom: 6,
   },
-  statValue: { fontSize: 24, fontWeight: '700', color: Colors.text, letterSpacing: -0.5 },
-  statUnit: { fontSize: 14, fontWeight: '400', color: Colors.textSecondary },
-  statSub: { fontSize: 11, color: Colors.success, marginTop: 4, fontWeight: '500' },
+  statValue: { fontSize: 24, fontFamily: Font.bold, color: Colors.text, letterSpacing: -0.5 },
+  statUnit: { fontSize: 14, fontFamily: Font.regular, color: Colors.textSecondary },
+  statSub: { fontSize: 11, color: Colors.success, marginTop: 4, fontFamily: Font.medium },
 
   foodCard: {
     backgroundColor: Colors.bg, borderRadius: Radius.lg,
@@ -389,20 +416,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md, paddingVertical: Spacing.md,
   },
   foodHeaderLeft: { flex: 1, marginRight: 12 },
-  foodTitle: { fontSize: 15, fontWeight: '600', color: Colors.text, letterSpacing: -0.2 },
-  foodSub:   { fontSize: 12, color: Colors.textSecondary, marginTop: 3 },
+  foodTitle: { fontSize: 15, fontFamily: Font.semiBold, color: Colors.text, letterSpacing: -0.2 },
+  foodSub:   { fontSize: 12, fontFamily: Font.regular, color: Colors.textSecondary, marginTop: 3 },
   foodRing: {
     width: 44, height: 44,
     alignItems: 'center', justifyContent: 'center',
   },
-  foodRingPct: { fontSize: 9, fontWeight: '700', color: Colors.primary },
+  foodRingPct: { fontSize: 9, fontFamily: Font.bold, color: Colors.primary },
   foodDivider: { height: 0.5, backgroundColor: Colors.border },
   macroSection: { paddingHorizontal: Spacing.md, paddingVertical: 12, gap: 8 },
   macroRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  macroLabel: { fontSize: 12, fontWeight: '500', color: Colors.textSecondary, width: 84, flexShrink: 0 },
+  macroLabel: { fontSize: 12, fontFamily: Font.medium, color: Colors.textSecondary, width: 84, flexShrink: 0 },
   macroTrack: { flex: 1, height: 5, backgroundColor: Colors.border, borderRadius: 3, overflow: 'hidden' },
   macroFill:  { height: 5, borderRadius: 3 },
-  macroVal:   { fontSize: 14, fontWeight: '600', color: Colors.text, width: 36, textAlign: 'right', flexShrink: 0 },
+  macroVal:   { fontSize: 14, fontFamily: Font.semiBold, color: Colors.text, width: 36, textAlign: 'right', flexShrink: 0 },
   mealRow: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
     paddingHorizontal: Spacing.md, paddingVertical: 12,
@@ -410,9 +437,9 @@ const styles = StyleSheet.create({
   },
   mealIcon: { fontSize: 20, width: 28, textAlign: 'center' },
   mealInfo: { flex: 1 },
-  mealName: { fontSize: 14, fontWeight: '600', color: Colors.text },
-  mealDesc: { fontSize: 12, color: Colors.textSecondary, marginTop: 1 },
-  mealKcal: { fontSize: 14, fontWeight: '600', color: Colors.textSecondary },
+  mealName: { fontSize: 14, fontFamily: Font.semiBold, color: Colors.text },
+  mealDesc: { fontSize: 12, fontFamily: Font.regular, color: Colors.textSecondary, marginTop: 1 },
+  mealKcal: { fontSize: 14, fontFamily: Font.semiBold, color: Colors.textSecondary },
   foodActions: {
     flexDirection: 'row', gap: Spacing.sm, padding: Spacing.md,
   },
@@ -422,26 +449,26 @@ const styles = StyleSheet.create({
     borderWidth: 0.5, borderColor: Colors.border,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
   },
-  foodBtnManualText: { fontSize: 14, fontWeight: '600', color: Colors.text },
+  foodBtnManualText: { fontSize: 14, fontFamily: Font.semiBold, color: Colors.text },
   foodBtnAi: {
     flex: 1, backgroundColor: Colors.primary,
     borderRadius: Radius.md, paddingVertical: 13,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
   },
-  foodBtnAiText: { fontSize: 14, fontWeight: '600', color: '#fff' },
+  foodBtnAiText: { fontSize: 14, fontFamily: Font.semiBold, color: '#fff' },
   badgeFree: {
     backgroundColor: Colors.border, borderRadius: 4,
     paddingHorizontal: 5, paddingVertical: 1,
   },
-  badgeFreeText: { fontSize: 9, fontWeight: '700', color: Colors.textSecondary },
+  badgeFreeText: { fontSize: 9, fontFamily: Font.bold, color: Colors.textSecondary },
   badgePro: {
     borderRadius: 4, paddingHorizontal: 5, paddingVertical: 1,
     backgroundColor: 'rgba(255,255,255,0.22)',
   },
-  badgeProText: { fontSize: 9, fontWeight: '700', color: '#fff' },
+  badgeProText: { fontSize: 9, fontFamily: Font.bold, color: '#fff' },
 
   disclaimer: {
-    fontSize: 11, color: Colors.textTertiary,
+    fontSize: 11, fontFamily: Font.regular, color: Colors.textTertiary,
     textAlign: 'center', marginTop: Spacing.sm, lineHeight: 16,
   },
 
@@ -451,7 +478,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary, borderRadius: Radius.lg,
     paddingVertical: 16, alignItems: 'center',
   },
-  fabText: { color: '#fff', fontSize: 16, fontWeight: '600', letterSpacing: 0.1 },
+  fabText: { color: '#fff', fontSize: 16, fontFamily: Font.semiBold, letterSpacing: 0.1 },
 
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
   sheet: {
@@ -463,12 +490,12 @@ const styles = StyleSheet.create({
     width: 36, height: 4, backgroundColor: Colors.border,
     borderRadius: 2, alignSelf: 'center', marginBottom: Spacing.md,
   },
-  sheetTitle: { fontSize: 20, fontWeight: '700', color: Colors.text, letterSpacing: -0.3 },
-  sheetSub: { fontSize: 13, color: Colors.textSecondary, marginTop: 4, marginBottom: Spacing.lg },
+  sheetTitle: { fontSize: 20, fontFamily: Font.bold, color: Colors.text, letterSpacing: -0.3 },
+  sheetSub: { fontSize: 13, fontFamily: Font.regular, color: Colors.textSecondary, marginTop: 4, marginBottom: Spacing.lg },
   doseGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
   doseBtn: {
     backgroundColor: Colors.primarySoft, borderRadius: Radius.md,
     paddingVertical: 14, paddingHorizontal: 20, minWidth: 90, alignItems: 'center',
   },
-  doseBtnText: { fontSize: 16, fontWeight: '600', color: Colors.primary },
+  doseBtnText: { fontSize: 16, fontFamily: Font.semiBold, color: Colors.primary },
 });

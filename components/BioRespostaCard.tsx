@@ -5,7 +5,7 @@ import Svg, {
   Text as SvgText, Defs, LinearGradient,
   Stop, ClipPath, G,
 } from 'react-native-svg';
-import { Colors, Spacing, Radius, Shadow } from '@/constants/theme';
+import { Colors, Font, Spacing, Radius, Shadow } from '@/constants/theme';
 import { useHealthStore } from '@/lib/health/appleHealth';
 
 const VBOX_W = 330;
@@ -52,9 +52,9 @@ export function BioRespostaCard() {
             strokeLinecap="round"
             rotation={-90} origin="24, 24"
           />
-          <SvgText x={24} y={25} fontSize={12} fontWeight="700" fill={Colors.text}
+          <SvgText x={24} y={25} fontSize={12} fontFamily={Font.bold} fill={Colors.text}
             textAnchor="middle">{data?.bioScore ?? 72}</SvgText>
-          <SvgText x={24} y={33} fontSize={7} fontWeight="700" fill={Colors.primary}
+          <SvgText x={24} y={33} fontSize={7} fontFamily={Font.bold} fill={Colors.primary}
             textAnchor="middle">{data?.bioLabel ?? 'BOM'}</SvgText>
         </Svg>
       </View>
@@ -130,7 +130,7 @@ export function BioRespostaCard() {
           <SvgText x={116} y={108} fontSize={8} fill="#9CA3AF" textAnchor="middle">06:00</SvgText>
           <SvgText x={179} y={108} fontSize={8} fill="#9CA3AF" textAnchor="middle">10:00</SvgText>
           <SvgText x={243} y={108} fontSize={8} fill="#9CA3AF" textAnchor="middle">14:00</SvgText>
-          <SvgText x={298} y={108} fontSize={8} fill={Colors.primary} textAnchor="end" fontWeight="600">17:27</SvgText>
+          <SvgText x={298} y={108} fontSize={8} fill={Colors.primary} textAnchor="end" fontFamily={Font.semiBold}>17:27</SvgText>
         </Svg>
       </View>
 
@@ -190,11 +190,11 @@ const styles = StyleSheet.create({
   },
   headerLeft: { flex: 1, marginRight: 12, gap: 3 },
   title: {
-    fontSize: 15, fontWeight: '600',
+    fontSize: 15, fontFamily: Font.semiBold,
     color: Colors.text, letterSpacing: -0.2,
   },
   subtitle: {
-    fontSize: 11, color: Colors.textTertiary,
+    fontSize: 11, fontFamily: Font.regular, color: Colors.textTertiary,
   },
 
   /* Chart */
@@ -222,16 +222,16 @@ const styles = StyleSheet.create({
     opacity: 0.45,
   },
   metricVal: {
-    fontSize: 15, fontWeight: '700',
+    fontSize: 15, fontFamily: Font.bold,
     color: Colors.text, letterSpacing: -0.3,
     lineHeight: 18,
   },
   metricUnit: {
-    fontSize: 11, fontWeight: '400',
+    fontSize: 11, fontFamily: Font.regular,
     color: Colors.textTertiary,
   },
   metricLabel: {
-    fontSize: 11, color: Colors.textTertiary,
-    marginTop: 3, fontWeight: '500',
+    fontSize: 11, fontFamily: Font.medium, color: Colors.textTertiary,
+    marginTop: 3,
   },
 });

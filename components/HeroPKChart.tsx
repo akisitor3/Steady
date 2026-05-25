@@ -1,85 +1,90 @@
 import React from 'react';
 import { useWindowDimensions } from 'react-native';
-import Svg, { Rect, Line } from 'react-native-svg';
-import { WeekPoint } from '@/lib/pk/engine';
+import Svg, { Path, Line, Circle } from 'react-native-svg';
+import { Injection, bodyLevel } from '@/lib/pk/engine';
 
-const VIEW_H = 44;
-const SIDE_PAD = 4;
+const SVG_H = 72;
+const PAD = { l: 18, r: 18, t: 10, b: 12 };
+const DAY_MS = 24 * 60 * 60 * 1000;
+const T_NEXT = 7;   // dias até próxima dose (semanal)
+const T_END  = T_NEXT + 1.5;
 
 interface Props {
-  weekly: WeekPoint[];
-  ss: number;
+  injections: Injection[];
+  halfLifeDays: number;
 }
 
-export function HeroPKChart({ weekly, ss }: Props) {
+export function HeroPKChart({ injections, halfLifeDays }: Props) {
   const { width: screenWidth } = useWindowDimensions();
-  // 32 horizontal padding from hero card + 2px visual
-  const svgWidth = screenWidth - 32 - 2;
+  const SVG_W = screenWidth - 32 - 4;
 
-  if (weekly.length === 0) {
-    return <Svg width={svgWidth} height={VIEW_H} />;
-  }
+  if (injections.length === 0) return <Svg width={SVG_W} height={SVG_H} />;
 
-  const maxTotal = Math.max(...weekly.map((p) => p.total));
-  const barAreaWidth = svgWidth - SIDE_PAD * 2;
-  const barCount = weekly.length;
-  const gap = Math.min(4, barAreaWidth / barCount * 0.25);
-  const barW = Math.max(4, (barAreaWidth - gap * (barCount - 1)) / barCount);
+  const sorted = [...injections].sort((a, b) => a.date - b.date);
+  const lastInj = sorted[sorted.length - 1];
+  const now     = Date.now();
 
-  const toY = (val: number) => {
-    if (maxTotal === 0) return VIEW_H;
-    return VIEW_H - (val / maxTotal) * (VIEW_H - 4);
+  const tNow  = Math.max(0, (now - lastInj.date) / DAY_MS);
+  const q0    = bodyLevel(sorted, lastInj.date, halfLifeDays);        // pico última dose
+  const qHoje = bodyLevel(sorted, now, halfLifeDays);
+  const qPre  = bodyLevel(sorted, lastInj.date + T_NEXT * DAY_MS, halfLifeDays);
+  const qPost = qPre + lastInj.doseMg;
+
+  // escala Y
+  const Q_MIN = Math.max(0, qPre * 0.85);
+  const Q_MAX = Math.max(q0, qPost) * 1.08;
+
+  const xOf = (t: number) => PAD.l + (t / T_END) * (SVG_W - PAD.l - PAD.r);
+  const yOf = (q: number) => {
+    if (Q_MAX === Q_MIN) return PAD.t + (SVG_H - PAD.t - PAD.b) / 2;
+    return PAD.t + (1 - (q - Q_MIN) / (Q_MAX - Q_MIN)) * (SVG_H - PAD.t - PAD.b);
   };
 
-  const ssY = ss > 0 && maxTotal > 0 ? toY(ss) : null;
+  const Ax = xOf(0),      Ay = yOf(q0);
+  const Bx = xOf(tNow),   By = yOf(qHoje);
+  const Cx = xOf(T_NEXT), CyLo = yOf(qPre), CyHi = yOf(qPost);
+  const Dx = xOf(T_END),  Dy   = yOf(qPost * Math.pow(0.5, 1.5 / halfLifeDays));
+  const yFloor = SVG_H - 4;
+
+  // curva de decaimento A → C (80 pontos suaves)
+  const decayPath = Array.from({ length: 81 }, (_, i) => {
+    const t = (T_NEXT / 80) * i;
+    const x = xOf(t).toFixed(1);
+    const y = yOf(bodyLevel(sorted, lastInj.date + t * DAY_MS, halfLifeDays)).toFixed(1);
+    return i === 0 ? `M${x},${y}` : `L${x},${y}`;
+  }).join(' ');
 
   return (
-    <Svg width={svgWidth} height={VIEW_H}>
-      {weekly.map((p, i) => {
-        const x = SIDE_PAD + i * (barW + gap);
-        const residualH = maxTotal > 0 ? (p.residual / maxTotal) * (VIEW_H - 4) : 0;
-        const freshH = maxTotal > 0 ? (p.fresh / maxTotal) * (VIEW_H - 4) : 0;
+    <Svg width={SVG_W} height={SVG_H}>
+      {/* linhas verticais de referência */}
+      <Line x1={Ax} y1={Ay} x2={Ax} y2={yFloor}
+        stroke="rgba(255,255,255,0.20)" strokeWidth={1} strokeDasharray="2,3" />
+      <Line x1={Cx} y1={CyHi} x2={Cx} y2={yFloor}
+        stroke="rgba(255,255,255,0.20)" strokeWidth={1} strokeDasharray="2,3" />
 
-        return (
-          <React.Fragment key={p.week}>
-            {/* Residual bar (base da pilha) */}
-            {residualH > 0 && (
-              <Rect
-                x={x}
-                y={VIEW_H - residualH}
-                width={barW}
-                height={residualH}
-                fill="rgba(255,255,255,0.30)"
-                rx={1}
-              />
-            )}
-            {/* Fresh bar (topo da pilha) */}
-            {freshH > 0 && (
-              <Rect
-                x={x}
-                y={VIEW_H - residualH - freshH}
-                width={barW}
-                height={freshH}
-                fill="rgba(255,255,255,0.80)"
-                rx={1}
-              />
-            )}
-          </React.Fragment>
-        );
-      })}
+      {/* curva decaimento (tracejada) */}
+      <Path d={decayPath}
+        fill="none" stroke="rgba(255,255,255,0.68)"
+        strokeWidth={1.5} strokeDasharray="4.5,4"
+        strokeLinecap="round" strokeLinejoin="round" />
 
-      {ssY !== null && (
-        <Line
-          x1={SIDE_PAD}
-          y1={ssY}
-          x2={svgWidth - SIDE_PAD}
-          y2={ssY}
-          stroke="rgba(255,255,255,0.45)"
-          strokeWidth={1}
-          strokeDasharray="4,3"
-        />
-      )}
+      {/* spike vertical na próxima dose */}
+      <Line x1={Cx} y1={CyLo} x2={Cx} y2={CyHi}
+        stroke="rgba(255,255,255,0.68)" strokeWidth={1.5} strokeLinecap="round" />
+
+      {/* preview decaimento pós-dose */}
+      <Path d={`M${Cx.toFixed(1)},${CyHi.toFixed(1)} L${Dx.toFixed(1)},${Dy.toFixed(1)}`}
+        fill="none" stroke="rgba(255,255,255,0.45)"
+        strokeWidth={1.5} strokeLinecap="round" />
+
+      {/* dot A — última injeção */}
+      <Circle cx={Ax} cy={Ay} r={5.5} fill="#fff" />
+
+      {/* dot B — hoje */}
+      <Circle cx={Bx} cy={By} r={3.5} fill="#fff" />
+
+      {/* dot C — próxima dose */}
+      <Circle cx={Cx} cy={CyHi} r={5.5} fill="#fff" />
     </Svg>
   );
 }
-

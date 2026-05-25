@@ -4,7 +4,7 @@ import Svg, {
   Path, Line, Text as SvgText, Defs,
   LinearGradient, Stop,
 } from 'react-native-svg';
-import { Colors, Spacing, Radius, Shadow } from '@/constants/theme';
+import { Colors, Font, Spacing, Radius, Shadow } from '@/constants/theme';
 import { useHealthStore } from '@/lib/health/appleHealth';
 
 const VBOX_W = 358;
@@ -84,14 +84,14 @@ export function VFCGaugeCard() {
         {/* Valor central */}
         <SvgText
           x={179} y={148}
-          fontSize={40} fontWeight="700" fill={Colors.text}
+          fontSize={40} fontFamily={Font.bold} fill={Colors.text}
           textAnchor="middle" letterSpacing={-1}
         >{(data?.hrvValue ?? 0.7).toFixed(1)}</SvgText>
 
         {/* Status */}
         <SvgText
           x={179} y={165}
-          fontSize={11} fontWeight="600" fill="#29B6F6"
+          fontSize={11} fontFamily={Font.semiBold} fill="#29B6F6"
           textAnchor="middle" letterSpacing={1.5}
         >{data?.hrvStatus ?? 'BAIXO'}</SvgText>
 
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: Font.semiBold,
     color: Colors.text,
     letterSpacing: -0.2,
     paddingHorizontal: Spacing.md,
@@ -130,6 +130,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 11,
+    fontFamily: Font.regular,
     color: Colors.textTertiary,
     paddingHorizontal: Spacing.md,
     paddingTop: 3,

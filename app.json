@@ -11,7 +11,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.steady.app",
       "infoPlist": {
-        "UIBackgroundModes": ["remote-notification"]
+        "UIBackgroundModes": [
+          "remote-notification"
+        ]
       }
     },
     "android": {
@@ -28,7 +30,9 @@
         {
           "color": "#0F6E56"
         }
-      ]
+      ],
+      "expo-asset",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

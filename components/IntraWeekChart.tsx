@@ -3,7 +3,7 @@ import Svg, { Path, Defs, LinearGradient, Stop, Line, Circle } from 'react-nativ
 import { useApp } from '@/lib/store/useApp';
 import { intraWeekCurve } from '@/lib/pk/engine';
 import { MEDICATIONS } from '@/constants/medications';
-import { Colors, Spacing, Radius, Shadow } from '@/constants/theme';
+import { Colors, Font, Spacing, Radius, Shadow } from '@/constants/theme';
 
 const CHART_H = 80;
 const PAD_LEFT = 8;
@@ -137,15 +137,15 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   header: { marginBottom: Spacing.sm },
-  title: { fontSize: 15, fontWeight: '600', color: Colors.text, letterSpacing: -0.2 },
-  subtitle: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
+  title: { fontSize: 15, fontFamily: Font.semiBold, color: Colors.text, letterSpacing: -0.2 },
+  subtitle: { fontSize: 12, fontFamily: Font.regular, color: Colors.textSecondary, marginTop: 2 },
   empty: { paddingVertical: Spacing.lg, alignItems: 'center' },
-  emptyText: { fontSize: 13, color: Colors.textSecondary, textAlign: 'center' },
+  emptyText: { fontSize: 13, fontFamily: Font.regular, color: Colors.textSecondary, textAlign: 'center' },
   axisLabels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: PAD_LEFT,
     marginTop: -PAD_BOTTOM + 2,
   },
-  axisLabel: { fontSize: 10, color: Colors.textTertiary },
+  axisLabel: { fontSize: 10, fontFamily: Font.regular, color: Colors.textTertiary },
 });
