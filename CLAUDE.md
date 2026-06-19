@@ -4,6 +4,15 @@ App móvel iOS/Android de tracking de medicamentos GLP-1 (Ozempic / Mounjaro) co
 
 ---
 
+## REGRA 0 — Início de Sessão (OBRIGATÓRIO)
+Ler antes de qualquer alteração: `docs/WIKI.md` → `docs/TODO.md` → `docs/LESSONS.md` → `docs/ARCHITECTURE.md` → `/Volumes/KHONSHU/Brain/Steady/LAST_SESSION.md`.
+> Brain (`/Volumes/KHONSHU/Brain/Steady/`) = arquivo master; `docs/` = versão operacional no repo.
+
+## REGRA 1 — Fecho de Sessão (OBRIGATÓRIO)
+Actualizar **SEMPRE os dois wikis** (nunca só um): **repo `docs/`** (WIKI/TODO/LESSONS/HANDOFFS_INDEX) **e Brain** (LAST_SESSION/handoffs/lessons/todo/WIKI).
+
+---
+
 ## Caminhos
 
 | Local | Path |
